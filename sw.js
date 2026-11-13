@@ -1,4 +1,4 @@
-const CACHE_NAME = 'koka-bloki-v5-png-m3';
+const CACHE_NAME = 'koka-bloki-v6-m3-laiks';
 const ASSETS = [
   './',
   './index.html',
