@@ -1,18 +1,55 @@
 {
+  "id": "./index.html",
   "name": "Koka Bloki",
   "short_name": "Koka Bloki",
-  "description": "Klasiska koka bloku mīklu spēle",
+  "description": "Klasiska koka bloku mīklu spēle braucieniem un brīvam brīdim",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#5b3315",
   "theme_color": "#7b4a26",
+  "categories": ["games", "puzzle"],
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%235b3315'/%3E%3Crect x='76' y='76' width='165' height='165' rx='24' fill='%23f5cf6b' stroke='%233d1d05' stroke-width='12'/%3E%3Crect x='271' y='76' width='165' height='165' rx='24' fill='%23e2ae44' stroke='%233d1d05' stroke-width='12'/%3E%3Crect x='76' y='271' width='165' height='165' rx='24' fill='%23e2ae44' stroke='%233d1d05' stroke-width='12'/%3E%3Crect x='271' y='271' width='165' height='165' rx='24' fill='%23c48826' stroke='%233d1d05' stroke-width='12'/%3E%3C/svg%3E",
-      "sizes": "512x512",
+      "src": "./icon-adaptive.svg",
+      "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-monochrome.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "monochrome"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Jauna spēle",
+      "short_name": "Jauna",
+      "description": "Sākt jaunu spēles partiju no nulles",
+      "url": "./index.html?action=new",
+      "icons": [
+        {
+          "src": "./shortcut-new.svg",
+          "sizes": "192x192",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Materiālu tēmas",
+      "short_name": "Tēmas",
+      "description": "Izvēlēties koka vai nefrīta tēmu",
+      "url": "./index.html?action=themes",
+      "icons": [
+        {
+          "src": "./shortcut-themes.svg",
+          "sizes": "192x192",
+          "type": "image/svg+xml"
+        }
+      ]
     }
   ]
 }

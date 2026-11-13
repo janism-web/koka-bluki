@@ -1,8 +1,12 @@
-const CACHE_NAME = 'koka-bloki-v3';
+const CACHE_NAME = 'koka-bloki-v4-m3';
 const ASSETS = [
   './',
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  './icon-adaptive.svg',
+  './icon-monochrome.svg',
+  './shortcut-new.svg',
+  './shortcut-themes.svg'
 ];
 
 self.addEventListener('install', (event) => {
@@ -23,6 +27,6 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request).then((cached) => cached || fetch(event.request))
+    caches.match(event.request, { ignoreSearch: true }).then((cached) => cached || fetch(event.request))
   );
 });

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8a5228"/>
+      <stop offset="100%" stop-color="#4e290f"/>
+    </linearGradient>
+    <linearGradient id="blockLight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fae084"/>
+      <stop offset="50%" stop-color="#e5b247"/>
+      <stop offset="100%" stop-color="#c48622"/>
+    </linearGradient>
+    <linearGradient id="blockWarm" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f2c45a"/>
+      <stop offset="100%" stop-color="#b57419"/>
+    </linearGradient>
+  </defs>
+  <!-- Safe-zone full-bleed background for Material 3 adaptive mask -->
+  <rect width="512" height="512" fill="url(#bgGrad)"/>
+  <!-- Subtle recessed grid shadow inside safe zone (inner 66% = ~338px centered) -->
+  <rect x="108" y="108" width="296" height="296" rx="36" fill="#321706" stroke="#b87c44" stroke-width="6"/>
+  <!-- L-shaped golden wooden tetromino centered in safe zone -->
+  <g stroke="#3d1d05" stroke-width="7">
+    <rect x="134" y="134" width="114" height="114" rx="22" fill="url(#blockLight)"/>
+    <rect x="134" y="264" width="114" height="114" rx="22" fill="url(#blockWarm)"/>
+    <rect x="264" y="264" width="114" height="114" rx="22" fill="url(#blockLight)"/>
+  </g>
+  <!-- Top bevel highlights -->
+  <g fill="none" stroke="rgba(255,250,215,0.7)" stroke-width="4">
+    <rect x="140" y="140" width="102" height="102" rx="17"/>
+    <rect x="140" y="270" width="102" height="102" rx="17"/>
+    <rect x="270" y="270" width="102" height="102" rx="17"/>
+  </g>
+  <!-- Sparkle / crown accent in top-right empty cell -->
+  <path d="M321 154 L331 179 L356 189 L331 199 L321 224 L311 199 L286 189 L311 179 Z" fill="#ffe66d"/>
+</svg>

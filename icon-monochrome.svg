@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Pure silhouette within Material 3 66% safe zone for Android Themed Icons -->
+  <rect x="128" y="128" width="118" height="118" rx="26" fill="#000000"/>
+  <rect x="128" y="266" width="118" height="118" rx="26" fill="#000000"/>
+  <rect x="266" y="266" width="118" height="118" rx="26" fill="#000000"/>
+  <path d="M325 144 L336 172 L364 183 L336 194 L325 222 L314 194 L286 183 L314 172 Z" fill="#000000"/>
+</svg>
