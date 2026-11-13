@@ -8,8 +8,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Koka Bloki</title>
 <link rel="manifest" href="./manifest.json">
-<link rel="icon" type="image/svg+xml" href="./icon-adaptive.svg">
-<link rel="apple-touch-icon" href="./icon-adaptive.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-512.png">
 <style>
   :root {
     --bg-radial: radial-gradient(circle at 50% 30%, #c8874b 0%, #8a5228 65%, #5b3315 100%);
@@ -620,6 +620,13 @@
     return THEMES.find(t => t.id === currentThemeId) || THEMES[0];
   }
 
+  
+  function updateDynamicFavicon(t) {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="${t.themeColor}"/><rect x="108" y="108" width="296" height="296" rx="36" fill="${t.boardFrame}" stroke="${t.boardBorder}" stroke-width="6"/><rect x="134" y="134" width="114" height="114" rx="22" fill="${t.blockTop}" stroke="${t.blockBorder}" stroke-width="7"/><rect x="134" y="264" width="114" height="114" rx="22" fill="${t.blockMid}" stroke="${t.blockBorder}" stroke-width="7"/><rect x="264" y="264" width="114" height="114" rx="22" fill="${t.blockTop}" stroke="${t.blockBorder}" stroke-width="7"/><path d="M321 154 L331 179 L356 189 L331 199 L321 224 L311 199 L286 189 L311 179 Z" fill="#ffe66d"/></svg>`;
+    const link = document.querySelector("link[rel='icon']");
+    if (link) link.href = "data:image/svg+xml," + encodeURIComponent(svg);
+  }
+
   function applyTheme(themeId) {
     const t = THEMES.find(x => x.id === themeId) || THEMES[0];
     currentThemeId = t.id;
@@ -634,6 +641,7 @@
     root.setProperty("--modal-bg", t.modalBg);
     root.setProperty("--modal-border", t.modalBorder);
     document.getElementById("meta-theme-color").setAttribute("content", t.themeColor);
+    updateDynamicFavicon(t);
   }
 
   const BASE_SHAPES = [

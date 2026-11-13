@@ -12,15 +12,33 @@
   "categories": ["games", "puzzle"],
   "icons": [
     {
-      "src": "./icon-adaptive.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "./icon-monochrome.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icon-mono-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "monochrome"
+    },
+    {
+      "src": "./icon-mono-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "monochrome"
     }
   ],
@@ -32,9 +50,9 @@
       "url": "./index.html?action=new",
       "icons": [
         {
-          "src": "./shortcut-new.svg",
+          "src": "./shortcut-new.png",
           "sizes": "192x192",
-          "type": "image/svg+xml"
+          "type": "image/png"
         }
       ]
     },
@@ -45,9 +63,9 @@
       "url": "./index.html?action=themes",
       "icons": [
         {
-          "src": "./shortcut-themes.svg",
+          "src": "./shortcut-themes.png",
           "sizes": "192x192",
-          "type": "image/svg+xml"
+          "type": "image/png"
         }
       ]
     }

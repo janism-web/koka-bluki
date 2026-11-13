@@ -1,12 +1,14 @@
-const CACHE_NAME = 'koka-bloki-v4-m3';
+const CACHE_NAME = 'koka-bloki-v5-png-m3';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './icon-adaptive.svg',
-  './icon-monochrome.svg',
-  './shortcut-new.svg',
-  './shortcut-themes.svg'
+  './icon-192.png',
+  './icon-512.png',
+  './icon-mono-192.png',
+  './icon-mono-512.png',
+  './shortcut-new.png',
+  './shortcut-themes.png'
 ];
 
 self.addEventListener('install', (event) => {
