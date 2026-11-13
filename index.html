@@ -183,21 +183,22 @@
     text-shadow: 0 2px 4px rgba(0,0,0,0.6);
   }
 
+  /* Controls + Powerups + Undo Bar */
   .controls-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 4px 4px 2px 4px;
-    gap: 6px;
+    padding: 4px 2px 2px 2px;
+    gap: 5px;
   }
   .powerups-group {
     display: flex;
-    gap: 6px;
+    gap: 5px;
     align-items: center;
   }
   .icon-btns {
     display: flex;
-    gap: 6px;
+    gap: 5px;
     align-items: center;
   }
   .btn-mini {
@@ -205,7 +206,7 @@
     border: 1.5px solid var(--btn-border);
     color: var(--text-main);
     border-radius: 10px;
-    padding: 6px 9px;
+    padding: 6px 8px;
     font-size: 12px;
     font-weight: 700;
     cursor: pointer;
@@ -213,14 +214,14 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    transition: transform 0.12s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.12s ease, border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
   }
   .btn-mini:active {
     transform: scale(0.94);
   }
   .btn-powerup {
     position: relative;
-    padding: 6px 10px;
+    padding: 6px 8px;
   }
   .btn-powerup.armed {
     border-color: #ffe047;
@@ -229,7 +230,7 @@
     animation: pulseArmed 1s infinite alternate;
   }
   .btn-powerup.empty {
-    opacity: 0.55;
+    opacity: 0.45;
   }
   @keyframes pulseArmed {
     from { transform: scale(1); }
@@ -242,7 +243,7 @@
     font-weight: 900;
     padding: 1px 5px;
     border-radius: 8px;
-    min-width: 17px;
+    min-width: 16px;
     text-align: center;
   }
 
@@ -454,6 +455,9 @@
 
   <div class="controls-bar">
     <div class="powerups-group">
+      <button class="btn-mini btn-powerup" id="undo-btn" title="Atsaukt pēdējo gājienu">
+        ↩ <span class="badge-count" id="undo-count">1</span>
+      </button>
       <button class="btn-mini btn-powerup" id="hammer-btn" title="Izsist 1 bloku">
         🔨 <span class="badge-count" id="hammer-count">1</span>
       </button>
@@ -463,7 +467,7 @@
     </div>
 
     <div class="icon-btns">
-      <button class="btn-mini" id="theme-btn">🎨 Tēmas</button>
+      <button class="btn-mini" id="theme-btn">🎨</button>
       <button class="btn-mini" id="sound-btn">🔊</button>
       <button class="btn-mini" id="reset-btn">↺</button>
     </div>
@@ -476,6 +480,7 @@
   </div>
 </div>
 
+<!-- Game Over Modal -->
 <div class="modal-backdrop" id="gameover-modal">
   <div class="modal-card">
     <div class="modal-badge" id="modal-record-badge">👑 Jauns rekords!</div>
@@ -495,6 +500,7 @@
   </div>
 </div>
 
+<!-- Themes Modal -->
 <div class="modal-backdrop" id="themes-modal">
   <div class="modal-card">
     <div class="modal-title">🎨 Materiālu tēmas</div>
@@ -510,8 +516,9 @@
   const FINGER_OFFSET_Y = 74;
   const TAP_THRESHOLD_PX = 14;
   const TAP_THRESHOLD_MS = 280;
+  const MAGNETIC_SNAP_RATIO = 0.44; // #1 Smart magnetic snap radius (in cell units)
   const STORAGE_BEST_KEY = "koka_bloki_best";
-  const STORAGE_STATE_KEY = "koka_bloki_saved_state_v2";
+  const STORAGE_STATE_KEY = "koka_bloki_saved_state_v3";
   const STORAGE_THEME_KEY = "koka_bloki_theme_v1";
 
   const THEMES = [
@@ -717,6 +724,14 @@
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
       osc.start(now);
       osc.stop(now + 0.07);
+    } else if (type === "undo") {
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(460, now);
+      osc.frequency.exponentialRampToValueAtTime(240, now + 0.11);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+      osc.start(now);
+      osc.stop(now + 0.12);
     } else if (type === "pickup") {
       osc.type = "sine";
       osc.frequency.setValueAtTime(260, now);
@@ -798,6 +813,8 @@
 
   let hammers = 1;
   let rerolls = 1;
+  let undos = 1; // #3 Undo 1x per game (+ earnable on Combo x3)
+  let undoSnapshot = null;
   let hammerArmed = false;
 
   let particles = [];
@@ -817,6 +834,17 @@
   let trayY = 0;
   let trayHeight = 0;
 
+  function createSnapshot() {
+    return {
+      grid: grid.map(r => [...r]),
+      tray: tray.map(p => p ? { shape: p.shape.map(row => [...row]), rotatable: p.rotatable } : null),
+      score,
+      combo,
+      hammers,
+      rerolls
+    };
+  }
+
   function saveGameState() {
     try {
       if (isGameOver) {
@@ -830,6 +858,8 @@
         combo,
         hammers,
         rerolls,
+        undos,
+        undoSnapshot,
         newRecordCelebrated
       };
       localStorage.setItem(STORAGE_STATE_KEY, JSON.stringify(state));
@@ -852,6 +882,8 @@
       combo = parsed.combo || 0;
       hammers = typeof parsed.hammers === "number" ? parsed.hammers : 1;
       rerolls = typeof parsed.rerolls === "number" ? parsed.rerolls : 1;
+      undos = typeof parsed.undos === "number" ? parsed.undos : 1;
+      undoSnapshot = parsed.undoSnapshot || null;
       newRecordCelebrated = !!parsed.newRecordCelebrated;
       isGameOver = false;
       refillTrayIfEmpty();
@@ -941,8 +973,12 @@
     if (combo > 0) comboBox.classList.add("active");
     else comboBox.classList.remove("active");
 
+    document.getElementById("undo-count").textContent = undos;
     document.getElementById("hammer-count").textContent = hammers;
     document.getElementById("reroll-count").textContent = rerolls;
+
+    const undoBtn = document.getElementById("undo-btn");
+    undoBtn.classList.toggle("empty", undos <= 0 || !undoSnapshot);
 
     const hammerBtn = document.getElementById("hammer-btn");
     hammerBtn.classList.toggle("empty", hammers <= 0);
@@ -1011,7 +1047,7 @@
   }
 
   function checkGameOver() {
-    if (hammers > 0 || rerolls > 0) return;
+    if (hammers > 0 || rerolls > 0 || (undos > 0 && undoSnapshot)) return;
 
     const remaining = tray.filter(p => p !== null);
     if (remaining.length === 0) return;
@@ -1047,7 +1083,9 @@
     floatingTexts.push({ x, y, text, life: 1.0 });
   }
 
-  function placePiece(piece, startR, startC) {
+  function placePiece(piece, startR, startC, preMoveSnapshot) {
+    undoSnapshot = preMoveSnapshot;
+
     let placedBlocks = 0;
     for (let r = 0; r < piece.shape.length; r++) {
       for (let c = 0; c < piece.shape[0].length; c++) {
@@ -1102,12 +1140,15 @@
 
       let bonusText = "";
       if (combo >= 3 && combo % 3 === 0) {
-        if (hammers <= rerolls) {
+        if (hammers <= rerolls && hammers <= undos) {
           hammers = Math.min(3, hammers + 1);
           bonusText = " (+1 🔨)";
-        } else {
+        } else if (rerolls <= undos) {
           rerolls = Math.min(3, rerolls + 1);
           bonusText = " (+1 🎲)";
+        } else {
+          undos = Math.min(3, undos + 1);
+          bonusText = " (+1 ↩)";
         }
       }
 
@@ -1141,7 +1182,82 @@
     checkGameOver();
   }
 
-  function drawWoodBlock(x, y, size, alpha = 1, isGhost = false, isHammerTarget = false) {
+  // #1 Smart Magnetic Snapping: finds exact match or closest valid cell within MAGNETIC_SNAP_RATIO
+  function getDropGridPos() {
+    if (!dragState) return null;
+    const piece = tray[dragState.index];
+    if (!piece) return null;
+
+    const rows = piece.shape.length;
+    const cols = piece.shape[0].length;
+    const pieceW = cols * cellSize;
+    const pieceH = rows * cellSize;
+
+    const topLeftX = dragState.currentX - pieceW / 2;
+    const topLeftY = dragState.currentY - pieceH / 2;
+
+    const exactCol = (topLeftX - boardX) / cellSize;
+    const exactRow = (topLeftY - boardY) / cellSize;
+
+    const roundCol = Math.round(exactCol);
+    const roundRow = Math.round(exactRow);
+
+    if (canPlace(piece.shape, roundRow, roundCol)) {
+      return { row: roundRow, col: roundCol };
+    }
+
+    // Magnetic search among neighboring cells if slightly off in moving train
+    let bestCandidate = null;
+    let bestDist = MAGNETIC_SNAP_RATIO;
+
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        const candR = roundRow + dr;
+        const candC = roundCol + dc;
+        if (canPlace(piece.shape, candR, candC)) {
+          const dist = Math.hypot(exactRow - candR, exactCol - candC);
+          if (dist <= bestDist) {
+            bestDist = dist;
+            bestCandidate = { row: candR, col: candC };
+          }
+        }
+      }
+    }
+
+    return bestCandidate;
+  }
+
+  // #2 Line Clear Preview: computes which rows & cols will clear if piece is placed at dropPos
+  function getPreviewClearedLines(piece, dropPos) {
+    if (!piece || !dropPos) return { rows: new Set(), cols: new Set() };
+
+    const tempGrid = grid.map(r => [...r]);
+    for (let r = 0; r < piece.shape.length; r++) {
+      for (let c = 0; c < piece.shape[0].length; c++) {
+        if (piece.shape[r][c]) {
+          tempGrid[dropPos.row + r][dropPos.col + c] = 1;
+        }
+      }
+    }
+
+    const previewRows = new Set();
+    const previewCols = new Set();
+
+    for (let r = 0; r < GRID_SIZE; r++) {
+      if (tempGrid[r].every(v => v === 1)) previewRows.add(r);
+    }
+    for (let c = 0; c < GRID_SIZE; c++) {
+      let full = true;
+      for (let r = 0; r < GRID_SIZE; r++) {
+        if (tempGrid[r][c] === 0) { full = false; break; }
+      }
+      if (full) previewCols.add(c);
+    }
+
+    return { rows: previewRows, cols: previewCols };
+  }
+
+  function drawWoodBlock(x, y, size, alpha = 1, isGhost = false, isHammerTarget = false, isLineHighlight = false) {
     const t = getActiveTheme();
     ctx.save();
     ctx.globalAlpha = alpha;
@@ -1153,9 +1269,9 @@
     const radius = Math.max(4, size * 0.14);
 
     if (isGhost) {
-      ctx.fillStyle = "rgba(255, 224, 115, 0.28)";
-      ctx.strokeStyle = "rgba(255, 232, 145, 0.85)";
-      ctx.lineWidth = 2;
+      ctx.fillStyle = isLineHighlight ? "rgba(255, 232, 95, 0.45)" : "rgba(255, 224, 115, 0.28)";
+      ctx.strokeStyle = isLineHighlight ? "#fff394" : "rgba(255, 232, 145, 0.85)";
+      ctx.lineWidth = isLineHighlight ? 2.5 : 2;
       roundRect(ctx, bx, by, bw, bh, radius);
       ctx.fill();
       ctx.stroke();
@@ -1181,13 +1297,18 @@
     ctx.fillRect(bx + bw * 0.18, by + bh * 0.28, bw * 0.64, Math.max(1.5, bh * 0.06));
     ctx.fillRect(bx + bw * 0.25, by + bh * 0.64, bw * 0.5, Math.max(1.5, bh * 0.05));
 
-    ctx.strokeStyle = isHammerTarget ? "#ff4d4d" : t.blockBorder;
-    ctx.lineWidth = isHammerTarget ? 2.5 : 1.2;
+    ctx.strokeStyle = isHammerTarget ? "#ff4d4d" : (isLineHighlight ? "#fff078" : t.blockBorder);
+    ctx.lineWidth = (isHammerTarget || isLineHighlight) ? 2.5 : 1.2;
     roundRect(ctx, bx, by, bw, bh, radius);
     ctx.stroke();
 
     if (isHammerTarget) {
       ctx.fillStyle = "rgba(255, 60, 60, 0.22)";
+      roundRect(ctx, bx, by, bw, bh, radius);
+      ctx.fill();
+    } else if (isLineHighlight) {
+      const pulse = 0.22 + 0.12 * Math.sin(performance.now() * 0.012);
+      ctx.fillStyle = `rgba(255, 242, 130, ${pulse})`;
       roundRect(ctx, bx, by, bw, bh, radius);
       ctx.fill();
     }
@@ -1213,31 +1334,14 @@
     };
   }
 
-  function getDropGridPos() {
-    if (!dragState) return null;
-    const piece = tray[dragState.index];
-    if (!piece) return null;
-
-    const rows = piece.shape.length;
-    const cols = piece.shape[0].length;
-    const pieceW = cols * cellSize;
-    const pieceH = rows * cellSize;
-
-    const topLeftX = dragState.currentX - pieceW / 2;
-    const topLeftY = dragState.currentY - pieceH / 2;
-
-    const col = Math.round((topLeftX - boardX) / cellSize);
-    const row = Math.round((topLeftY - boardY) / cellSize);
-
-    if (canPlace(piece.shape, row, col)) {
-      return { row, col };
-    }
-    return null;
-  }
-
   function draw() {
     const t = getActiveTheme();
     ctx.clearRect(0, 0, width, height);
+
+    const dropPos = (dragState && dragState.isDragging) ? getDropGridPos() : null;
+    const activePiece = (dragState && dragState.isDragging) ? tray[dragState.index] : null;
+    const previewLines = getPreviewClearedLines(activePiece, dropPos);
+    const hasLineHighlight = previewLines.rows.size > 0 || previewLines.cols.size > 0;
 
     const framePad = 8;
     ctx.save();
@@ -1263,23 +1367,27 @@
         ctx.stroke();
 
         if (grid[r][c] === 1) {
-          drawWoodBlock(cx, cy, cellSize, 1, false, hammerArmed);
+          const highlightCell = previewLines.rows.has(r) || previewLines.cols.has(c);
+          drawWoodBlock(cx, cy, cellSize, 1, false, hammerArmed, highlightCell);
         }
       }
     }
 
-    const dropPos = getDropGridPos();
-    if (dragState && dropPos) {
-      const piece = tray[dragState.index];
-      for (let r = 0; r < piece.shape.length; r++) {
-        for (let c = 0; c < piece.shape[0].length; c++) {
-          if (piece.shape[r][c]) {
+    if (dragState && dropPos && activePiece) {
+      for (let r = 0; r < activePiece.shape.length; r++) {
+        for (let c = 0; c < activePiece.shape[0].length; c++) {
+          if (activePiece.shape[r][c]) {
+            const gr = dropPos.row + r;
+            const gc = dropPos.col + c;
+            const highlightGhost = previewLines.rows.has(gr) || previewLines.cols.has(gc);
             drawWoodBlock(
-              boardX + (dropPos.col + c) * cellSize,
-              boardY + (dropPos.row + r) * cellSize,
+              boardX + gc * cellSize,
+              boardY + gr * cellSize,
               cellSize,
               1,
-              true
+              true,
+              false,
+              highlightGhost
             );
           }
         }
@@ -1303,6 +1411,20 @@
       ctx.restore();
       fc.life -= 0.06;
       if (fc.life <= 0) flashCells.splice(i, 1);
+    }
+
+    // #5 Thumb-Zone Ergonomics: subtle visual touch-slot containers so player sees full 1/3 thumb hit-area
+    const slotW = width / 3;
+    for (let i = 0; i < 3; i++) {
+      const slotPad = 5;
+      ctx.save();
+      ctx.fillStyle = "rgba(20, 9, 2, 0.16)";
+      ctx.strokeStyle = "rgba(255, 235, 195, 0.12)";
+      ctx.lineWidth = 1;
+      roundRect(ctx, i * slotW + slotPad, trayY, slotW - slotPad * 2, trayHeight, 14);
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
     }
 
     const miniCell = Math.min(cellSize * 0.56, (width / 3 - 26) / 5);
@@ -1341,7 +1463,7 @@
       if (piece.rotatable && !hammerArmed) {
         ctx.save();
         const badgeX = center.x;
-        const badgeY = trayY + trayHeight - 10;
+        const badgeY = trayY + trayHeight - 13;
         ctx.fillStyle = "rgba(25, 12, 4, 0.55)";
         roundRect(ctx, badgeX - 13, badgeY - 10, 26, 18, 9);
         ctx.fill();
@@ -1354,26 +1476,26 @@
       }
     }
 
-    if (dragState && dragState.isDragging) {
-      const piece = tray[dragState.index];
-      if (piece) {
-        const rows = piece.shape.length;
-        const cols = piece.shape[0].length;
-        const pw = cols * cellSize;
-        const ph = rows * cellSize;
-        const startX = dragState.currentX - pw / 2;
-        const startY = dragState.currentY - ph / 2;
+    if (dragState && dragState.isDragging && activePiece) {
+      const rows = activePiece.shape.length;
+      const cols = activePiece.shape[0].length;
+      const pw = cols * cellSize;
+      const ph = rows * cellSize;
+      const startX = dragState.currentX - pw / 2;
+      const startY = dragState.currentY - ph / 2;
 
-        for (let r = 0; r < rows; r++) {
-          for (let c = 0; c < cols; c++) {
-            if (piece.shape[r][c]) {
-              drawWoodBlock(
-                startX + c * cellSize,
-                startY + r * cellSize,
-                cellSize,
-                0.95
-              );
-            }
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          if (activePiece.shape[r][c]) {
+            drawWoodBlock(
+              startX + c * cellSize,
+              startY + r * cellSize,
+              cellSize,
+              0.95,
+              false,
+              false,
+              hasLineHighlight
+            );
           }
         }
       }
@@ -1438,6 +1560,7 @@
       const col = Math.floor((pos.x - boardX) / cellSize);
       const row = Math.floor((pos.y - boardY) / cellSize);
       if (row >= 0 && row < GRID_SIZE && col >= 0 && col < GRID_SIZE && grid[row][col] === 1) {
+        undoSnapshot = createSnapshot();
         grid[row][col] = 0;
         hammers--;
         hammerArmed = false;
@@ -1477,9 +1600,10 @@
       return;
     }
 
-    if (pos.y >= trayY - 12) {
-      const slotIndex = Math.floor(pos.x / (width / 3));
-      if (slotIndex >= 0 && slotIndex < 3 && tray[slotIndex] !== null) {
+    // #5 Thumb-Zone Ergonomics: entire 1/3 bottom slot responds to touch
+    if (pos.y >= trayY - 14) {
+      const slotIndex = Math.max(0, Math.min(2, Math.floor(pos.x / (width / 3))));
+      if (tray[slotIndex] !== null) {
         dragState = {
           index: slotIndex,
           startX: pos.x,
@@ -1487,7 +1611,8 @@
           currentX: pos.x,
           currentY: pos.y - FINGER_OFFSET_Y,
           startTime: performance.now(),
-          isDragging: false
+          isDragging: false,
+          lastSnapKey: null
         };
       }
     }
@@ -1510,6 +1635,16 @@
     if (dragState.isDragging) {
       dragState.currentX = pos.x;
       dragState.currentY = pos.y - FINGER_OFFSET_Y;
+
+      // #4 Tactile Micro-Haptics: subtle 6ms tick each time the piece snaps onto a new grid cell
+      const dropPos = getDropGridPos();
+      const snapKey = dropPos ? `${dropPos.row},${dropPos.col}` : null;
+      if (snapKey !== dragState.lastSnapKey) {
+        dragState.lastSnapKey = snapKey;
+        if (snapKey !== null) {
+          vibrate(6);
+        }
+      }
     }
   }
 
@@ -1531,8 +1666,9 @@
     } else if (dragState.isDragging && piece) {
       const dropPos = getDropGridPos();
       if (dropPos) {
+        const preMoveSnapshot = createSnapshot();
         tray[dragState.index] = null;
-        placePiece(piece, dropPos.row, dropPos.col);
+        placePiece(piece, dropPos.row, dropPos.col, preMoveSnapshot);
       }
     }
 
@@ -1547,6 +1683,35 @@
   canvas.addEventListener("mousedown", onPointerDown);
   window.addEventListener("mousemove", onPointerMove);
   window.addEventListener("mouseup", onPointerUp);
+
+  // #3 Undo 1x Button
+  document.getElementById("undo-btn").addEventListener("click", () => {
+    ensureAudio();
+    if (undos <= 0 || !undoSnapshot) {
+      setStatusMessage("↩ Nav pieejama gājiena atsaukšana!", false);
+      vibrate(30);
+      return;
+    }
+    hammerArmed = false;
+    undos--;
+    grid = undoSnapshot.grid.map(r => [...r]);
+    tray = undoSnapshot.tray.map(p => p ? {
+      shape: p.shape.map(row => [...row]),
+      rotatable: p.rotatable,
+      animScale: 0.82
+    } : null);
+    score = undoSnapshot.score;
+    combo = undoSnapshot.combo;
+    hammers = undoSnapshot.hammers;
+    rerolls = undoSnapshot.rerolls;
+    undoSnapshot = null;
+
+    playWoodSound("undo");
+    vibrate([15, 25, 15]);
+    addFloatingText(boardX + boardSize / 2, boardY + boardSize * 0.5, "↩ Gājiens atsaukts");
+    updateUI();
+    saveGameState();
+  });
 
   document.getElementById("hammer-btn").addEventListener("click", () => {
     ensureAudio();
@@ -1572,6 +1737,7 @@
       vibrate(30);
       return;
     }
+    undoSnapshot = createSnapshot();
     hammerArmed = false;
     rerolls--;
     tray = [randomPiece(), randomPiece(), randomPiece()];
@@ -1640,6 +1806,8 @@
     combo = 0;
     hammers = 1;
     rerolls = 1;
+    undos = 1;
+    undoSnapshot = null;
     hammerArmed = false;
     newRecordCelebrated = false;
     isGameOver = false;
