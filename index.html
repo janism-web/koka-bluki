@@ -95,7 +95,6 @@
     padding: env(safe-area-inset-top, 10px) 14px env(safe-area-inset-bottom, 12px) 14px;
   }
 
-  /* #1 Harmonized Material Header Capsules */
   .header {
     display: flex;
     align-items: stretch;
@@ -177,7 +176,6 @@
     transform: scale(0.94);
   }
 
-  /* #2 Clean Vector-Icon Action Bar */
   .action-bar {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -233,7 +231,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 26px;
+    min-height: 24px;
     padding: 2px 0;
   }
   .status-banner {
@@ -282,7 +280,6 @@
     height: 100%;
   }
 
-  /* #4 Modern Material 3 Elevated Dialogs */
   .modal-backdrop {
     position: fixed;
     inset: 0;
@@ -444,7 +441,6 @@
     transform: scale(0.97);
   }
 
-  /* Settings Menu Items */
   .settings-list {
     display: flex;
     flex-direction: column;
@@ -493,7 +489,6 @@
     color: #ffffff;
   }
 
-  /* #4 Theme Selector List with Visual Progress Bars */
   .theme-list {
     display: flex;
     flex-direction: column;
@@ -576,7 +571,6 @@
 </head>
 <body>
 <div id="app">
-  <!-- #1 & #2 Harmonized Material Header with Vector SVG Icons & Tabular Numerals -->
   <div class="header">
     <div class="stat-capsule score-primary">
       <div class="stat-label">
@@ -610,7 +604,6 @@
     </button>
   </div>
 
-  <!-- #2 Clean Vector-Icon Action Bar -->
   <div class="action-bar">
     <button class="btn-action" id="undo-btn">
       <svg class="m-icon" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11"/></svg>
@@ -645,7 +638,7 @@
   </div>
 </div>
 
-<!-- #4 Material 3 Game Over Modal -->
+<!-- Game Over Modal -->
 <div class="modal-backdrop" id="gameover-modal">
   <div class="modal-card">
     <div class="modal-badge" id="modal-record-badge">
@@ -681,7 +674,7 @@
   </div>
 </div>
 
-<!-- #4 Material 3 Settings / Menu Modal -->
+<!-- Settings / Menu Modal -->
 <div class="modal-backdrop" id="settings-modal">
   <div class="modal-card">
     <div class="modal-header-icon">
@@ -719,7 +712,7 @@
   </div>
 </div>
 
-<!-- #4 Material 3 Themes Modal with Visual Progress Bars -->
+<!-- Themes Modal -->
 <div class="modal-backdrop" id="themes-modal">
   <div class="modal-card">
     <div class="modal-title">Materiālu tēmas</div>
@@ -737,10 +730,9 @@
   const TAP_THRESHOLD_MS = 280;
   const MAGNETIC_SNAP_RATIO = 0.44;
   const STORAGE_BEST_KEY = "koka_bloki_best";
-  const STORAGE_STATE_KEY = "koka_bloki_saved_state_v5";
+  const STORAGE_STATE_KEY = "koka_bloki_saved_state_v6";
   const STORAGE_THEME_KEY = "koka_bloki_theme_v1";
 
-  // #1 Unified Dynamic Color Tokens for each theme
   const THEMES = [
     {
       id: "oak",
@@ -1062,7 +1054,7 @@
   let grid = Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(0));
   let tray = [null, null, null];
   let score = 0;
-  let displayedScore = 0; // #3 Smooth roll-up score counter
+  let displayedScore = 0;
   let bestScore = parseInt(localStorage.getItem(STORAGE_BEST_KEY) || "0", 10);
   let newRecordCelebrated = false;
   let isGameOver = false;
@@ -1152,6 +1144,7 @@
     }
   }
 
+  // Proportional vertical distribution: eliminates top & bottom dead space on tall 20:9 displays
   function resize() {
     const rect = canvas.parentElement.getBoundingClientRect();
     width = rect.width;
@@ -1162,17 +1155,24 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     const maxBoardW = width - 16;
-    // Ensure board + gap + proportional tray (3.45 * cellSize) fit comfortably with balanced vertical centering
-    const maxBoardH = (height - 28) / (1 + 3.45 / GRID_SIZE);
+    const minTopMargin = 10;
+    const minBottomMargin = 10;
+    const minGap = 16;
+    const maxBoardH = (height - (minTopMargin + minBottomMargin + minGap)) / (1 + 3.45 / GRID_SIZE);
+
     boardSize = Math.floor(Math.min(maxBoardW, maxBoardH));
     cellSize = boardSize / GRID_SIZE;
-
-    const gapBetween = 14;
     trayHeight = Math.round(cellSize * 3.45);
-    const totalContentH = boardSize + gapBetween + trayHeight;
+
+    const freeVertical = Math.max(0, height - boardSize - trayHeight);
+    // Distribute free vertical space cleanly: ~22% top margin, ~44% between board & dock, ~34% bottom margin
+    const topMargin = Math.max(8, Math.round(freeVertical * 0.22));
+    const gapBetween = Math.max(14, Math.min(38, Math.round(freeVertical * 0.44)));
+    const remainingBottom = height - topMargin - boardSize - gapBetween - trayHeight;
+    const extraOffset = remainingBottom > 34 ? Math.round((remainingBottom - 22) * 0.35) : 0;
 
     boardX = Math.floor((width - boardSize) / 2);
-    boardY = Math.max(6, Math.floor((height - totalContentH) * 0.44));
+    boardY = topMargin + extraOffset;
     trayY = boardY + boardSize + gapBetween;
   }
 
@@ -1599,7 +1599,29 @@
     };
   }
 
-  // #5 Draw crisp vector Material rotation badge in top-right corner of rotatable slot
+  // Adaptive Piece Scaling: scales block size inside the dock slot based on piece dimensions
+  function getAdaptiveDockCellSize(piece, slotInnerW, slotInnerH) {
+    const rows = piece.shape.length;
+    const cols = piece.shape[0].length;
+    const maxDim = Math.max(rows, cols);
+
+    // Target ratio relative to main grid cellSize based on piece span
+    let targetRatio = 0.60;
+    if (maxDim === 1) targetRatio = 0.88;
+    else if (maxDim === 2) targetRatio = 0.78;
+    else if (maxDim === 3) targetRatio = 0.68;
+    else if (maxDim === 4) targetRatio = 0.60;
+    else targetRatio = 0.54;
+
+    const desiredSize = cellSize * targetRatio;
+    const padX = piece.rotatable ? 28 : 18;
+    const padY = 18;
+    const maxFitW = (slotInnerW - padX) / cols;
+    const maxFitH = (slotInnerH - padY) / rows;
+
+    return Math.min(desiredSize, maxFitW, maxFitH);
+  }
+
   function drawRotateBadge(cx, cy, t) {
     ctx.save();
     ctx.fillStyle = t.surfaceRecessed;
@@ -1610,7 +1632,6 @@
     ctx.fill();
     ctx.stroke();
 
-    // Vector circular arrow inside badge
     ctx.strokeStyle = t.accentPrimary;
     ctx.lineWidth = 1.8;
     ctx.lineCap = "round";
@@ -1618,7 +1639,6 @@
     ctx.arc(cx, cy, 5, -Math.PI * 0.75, Math.PI * 0.65);
     ctx.stroke();
 
-    // Arrowhead
     const tipX = cx + 5 * Math.cos(-Math.PI * 0.75);
     const tipY = cy + 5 * Math.sin(-Math.PI * 0.75);
     ctx.beginPath();
@@ -1632,7 +1652,6 @@
   function draw() {
     const t = getActiveTheme();
 
-    // #3 Smooth roll-up score counter animation
     if (displayedScore !== score) {
       const diff = score - displayedScore;
       const step = Math.sign(diff) * Math.max(1, Math.ceil(Math.abs(diff) * 0.22));
@@ -1724,7 +1743,6 @@
       if (fc.life <= 0) flashCells.splice(i, 1);
     }
 
-    // #5 Recessed Wooden Dock Tray at bottom with individual carved slots
     const dockX = boardX - framePad;
     const dockW = boardSize + framePad * 2;
     ctx.save();
@@ -1750,7 +1768,6 @@
       ctx.restore();
     }
 
-    const miniCell = Math.min(cellSize * 0.60, (slotInnerW - 16) / 5, (slotInnerH - 16) / 5);
     for (let i = 0; i < 3; i++) {
       const piece = tray[i];
       if (!piece) continue;
@@ -1759,14 +1776,15 @@
       const center = getTraySlotCenter(i);
       const rows = piece.shape.length;
       const cols = piece.shape[0].length;
+      const dynCell = getAdaptiveDockCellSize(piece, slotInnerW, slotInnerH);
 
       if (piece.animScale < 1) {
         piece.animScale = Math.min(1, piece.animScale + 0.12);
       }
 
       const scale = piece.animScale;
-      const pw = cols * miniCell * scale;
-      const ph = rows * miniCell * scale;
+      const pw = cols * dynCell * scale;
+      const ph = rows * dynCell * scale;
       const startX = center.x - pw / 2;
       const startY = center.y - ph / 2;
 
@@ -1774,16 +1792,15 @@
         for (let c = 0; c < cols; c++) {
           if (piece.shape[r][c]) {
             drawWoodBlock(
-              startX + c * miniCell * scale,
-              startY + r * miniCell * scale,
-              miniCell * scale,
+              startX + c * dynCell * scale,
+              startY + r * dynCell * scale,
+              dynCell * scale,
               hammerArmed ? 0.45 : 1
             );
           }
         }
       }
 
-      // #5 Top-right circular Material badge for rotatable pieces
       if (piece.rotatable && !hammerArmed) {
         const sx = dockX + slotGap + i * (slotInnerW + slotGap);
         const sy = trayY + slotGap;
@@ -1919,7 +1936,7 @@
       return;
     }
 
-    if (pos.y >= trayY - 12) {
+    if (pos.y >= trayY - 14) {
       const slotIndex = Math.max(0, Math.min(2, Math.floor(pos.x / (width / 3))));
       if (tray[slotIndex] !== null) {
         dragState = {
@@ -2073,7 +2090,6 @@
     checkGameOver();
   });
 
-  // Settings Modal & Safe 2-step Reset Confirmation
   let resetConfirmTimeout = null;
   let resetConfirmArmed = false;
 
@@ -2132,7 +2148,6 @@
     }
   });
 
-  // #4 Material 3 Themes Modal with Visual Progress Bars
   function renderThemesList() {
     const list = document.getElementById("theme-list");
     list.innerHTML = "";
@@ -2198,7 +2213,6 @@
     document.getElementById("themes-modal").classList.remove("show");
   });
 
-  // Peek Board & Share Score
   const peekBtn = document.getElementById("peek-board-btn");
   const gameOverModal = document.getElementById("gameover-modal");
 

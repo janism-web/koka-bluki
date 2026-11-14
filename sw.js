@@ -1,4 +1,4 @@
-const CACHE_NAME = 'koka-bloki-v10-proportions';
+const CACHE_NAME = 'koka-bloki-v11-dynamic-scale';
 const ASSETS = [
   './',
   './index.html',
