@@ -12,16 +12,19 @@
 <link rel="apple-touch-icon" href="./icon-512.png">
 <style>
   :root {
-    --bg-radial: radial-gradient(circle at 50% 30%, #c8874b 0%, #8a5228 65%, #5b3315 100%);
+    --bg-radial: radial-gradient(circle at 50% 25%, #c9884c 0%, #874f26 65%, #562f12 100%);
     --grain-color: rgba(45, 22, 6, 0.045);
-    --text-main: #ffe9c4;
-    --text-sub: #fae1b8;
-    --accent-gold: #ffe047;
-    --btn-bg: rgba(58, 29, 10, 0.68);
-    --btn-border: #b57b45;
-    --combo-label: #4b250b;
-    --modal-bg: linear-gradient(180deg, #b8763e 0%, #7d481e 100%);
-    --modal-border: #eab676;
+    --surface-recessed: rgba(46, 22, 6, 0.78);
+    --surface-recessed-border: rgba(235, 186, 122, 0.36);
+    --surface-elevated: rgba(62, 31, 10, 0.72);
+    --surface-elevated-border: rgba(235, 186, 122, 0.34);
+    --text-primary: #fff4dc;
+    --text-secondary: #f2d4a2;
+    --accent-primary: #ffd859;
+    --accent-contrast: #3b1c04;
+    --modal-surface: #693b18;
+    --modal-surface-alt: #4d290f;
+    --modal-outline: rgba(255, 226, 173, 0.26);
   }
 
   * {
@@ -39,6 +42,7 @@
     overflow: hidden;
     background: var(--bg-radial);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-variant-numeric: tabular-nums;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -60,6 +64,25 @@
     z-index: 0;
   }
 
+  .m-icon {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+  }
+  .m-icon-sm {
+    width: 15px;
+    height: 15px;
+  }
+  .m-icon-lg {
+    width: 22px;
+    height: 22px;
+  }
+
   #app {
     position: relative;
     z-index: 1;
@@ -69,196 +92,180 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: env(safe-area-inset-top, 12px) 14px env(safe-area-inset-bottom, 14px) 14px;
+    padding: env(safe-area-inset-top, 10px) 14px env(safe-area-inset-bottom, 12px) 14px;
   }
 
+  /* #1 Harmonized Material Header Capsules */
   .header {
     display: flex;
+    align-items: stretch;
     justify-content: space-between;
-    align-items: center;
-    padding: 8px 4px 4px 4px;
+    padding: 4px 0;
     gap: 8px;
   }
 
-  .score-box {
-    position: relative;
+  .stat-capsule {
     flex: 1;
-    max-width: 148px;
-    height: 44px;
-    background: linear-gradient(180deg, #8b42d6 0%, #5b229e 100%);
-    border: 2px solid #b57cf0;
-    border-radius: 14px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.35), inset 0 2px 3px rgba(255,255,255,0.35);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 12px;
-  }
-
-  .crown-icon {
-    position: absolute;
-    top: -18px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 26px;
-    height: 20px;
-    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.4));
-  }
-
-  #score-val {
-    color: #ffe047;
-    font-size: 23px;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-    text-shadow: 0 2px 3px rgba(0,0,0,0.5);
-  }
-
-  .best-pill {
+    height: 50px;
+    background: var(--surface-recessed);
+    border: 1.5px solid var(--surface-recessed-border);
+    border-radius: 16px;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.42), 0 1px 0 rgba(255, 255, 255, 0.14);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: var(--text-sub);
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-    opacity: 0.95;
-    margin-top: 10px;
-    transition: transform 0.25s ease;
+    padding: 4px 8px;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
   }
-  .best-pill.record-broken {
-    transform: scale(1.14);
-    color: #ffe047;
+  .stat-capsule.score-primary {
+    flex: 1.25;
+    border-color: var(--accent-primary);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.45), 0 0 12px rgba(255, 216, 89, 0.22);
   }
-  #best-val {
-    font-size: 16px;
-    color: #fff3d6;
-    font-weight: 800;
+  .stat-capsule.combo-active {
+    border-color: var(--accent-primary);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.45), 0 0 14px rgba(255, 216, 89, 0.45);
   }
-  .best-pill.record-broken #best-val {
-    color: #ffe047;
-    text-shadow: 0 0 8px rgba(255, 224, 71, 0.7);
+  .stat-capsule.record-broken {
+    transform: scale(1.06);
+    border-color: var(--accent-primary);
   }
 
-  .combo-wrapper {
-    position: relative;
-    flex: 1;
-    max-width: 148px;
-    margin-top: 12px;
+  .stat-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.75px;
+    color: var(--text-secondary);
+    opacity: 0.9;
   }
-  .combo-label {
-    position: absolute;
-    top: -15px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: var(--combo-label);
-    font-size: 13px;
+  .stat-value {
+    font-size: 20px;
     font-weight: 900;
-    letter-spacing: 0.8px;
-    text-shadow: 0 1px 0 rgba(255,255,255,0.28);
-    z-index: 2;
+    line-height: 1.15;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
   }
-  .combo-box {
-    height: 44px;
-    background: linear-gradient(180deg, #532c11 0%, #371b08 100%);
-    border: 2px solid #9e6b3b;
-    border-radius: 14px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.35), inset 0 2px 6px rgba(0,0,0,0.6);
+  .stat-capsule.score-primary .stat-value {
+    font-size: 23px;
+    color: var(--accent-primary);
+  }
+  .stat-capsule.combo-active .stat-value {
+    color: var(--accent-primary);
+  }
+
+  .btn-settings {
+    width: 50px;
+    height: 50px;
+    border-radius: 16px;
+    background: var(--surface-elevated);
+    border: 1.5px solid var(--surface-elevated-border);
+    color: var(--text-primary);
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.25s ease;
-    position: relative;
-    overflow: hidden;
-  }
-  .combo-box.active {
-    border-color: #ffdf6b;
-    box-shadow: 0 0 16px rgba(255, 215, 70, 0.75), inset 0 0 10px rgba(255, 200, 50, 0.4);
-  }
-  #combo-val {
-    color: #ffffff;
-    font-size: 21px;
-    font-weight: 800;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.6);
-  }
-
-  /* Controls + Powerups + Undo Bar */
-  .controls-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 4px 2px 2px 2px;
-    gap: 5px;
-  }
-  .powerups-group {
-    display: flex;
-    gap: 5px;
-    align-items: center;
-  }
-  .icon-btns {
-    display: flex;
-    gap: 5px;
-    align-items: center;
-  }
-  .btn-mini {
-    background: var(--btn-bg);
-    border: 1.5px solid var(--btn-border);
-    color: var(--text-main);
-    border-radius: 10px;
-    padding: 6px 8px;
-    font-size: 12px;
-    font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    transition: transform 0.12s ease, border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    flex-shrink: 0;
+    transition: transform 0.12s ease;
   }
-  .btn-mini:active {
+  .btn-settings:active {
     transform: scale(0.94);
   }
-  .btn-powerup {
-    position: relative;
-    padding: 6px 8px;
+
+  /* #2 Clean Vector-Icon Action Bar */
+  .action-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 4px 0 2px 0;
   }
-  .btn-powerup.armed {
-    border-color: #ffe047;
-    background: rgba(180, 110, 15, 0.9);
-    box-shadow: 0 0 12px rgba(255, 224, 71, 0.85);
+  .btn-action {
+    min-height: 46px;
+    background: var(--surface-elevated);
+    border: 1.5px solid var(--surface-elevated-border);
+    color: var(--text-primary);
+    border-radius: 14px;
+    padding: 6px 8px;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: transform 0.12s ease, border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  }
+  .btn-action:active {
+    transform: scale(0.95);
+  }
+  .btn-action.armed {
+    border-color: var(--accent-primary);
+    background: rgba(168, 102, 12, 0.92);
+    box-shadow: 0 0 14px rgba(255, 216, 89, 0.65);
     animation: pulseArmed 1s infinite alternate;
   }
-  .btn-powerup.empty {
-    opacity: 0.45;
+  .btn-action.empty {
+    opacity: 0.44;
   }
   @keyframes pulseArmed {
     from { transform: scale(1); }
-    to { transform: scale(1.06); }
+    to { transform: scale(1.03); }
   }
   .badge-count {
-    background: #ffe047;
-    color: #3d1d05;
+    background: var(--accent-primary);
+    color: var(--accent-contrast);
     font-size: 11px;
     font-weight: 900;
-    padding: 1px 5px;
-    border-radius: 8px;
-    min-width: 16px;
+    padding: 1px 6px;
+    border-radius: 99px;
+    min-width: 19px;
     text-align: center;
+    font-variant-numeric: tabular-nums;
   }
 
-  .status-banner {
-    text-align: center;
-    color: var(--text-sub);
-    font-size: 12px;
-    font-weight: 700;
-    min-height: 18px;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  .status-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 26px;
     padding: 2px 0;
   }
-  .status-banner.hammer-mode {
-    color: #ffe047;
-    font-size: 13px;
+  .status-banner {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 700;
+    opacity: 0.92;
+  }
+  .btn-cancel-hammer {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: #c93426;
+    border: 1.5px solid #ffd5d0;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 5px 14px;
+    border-radius: 99px;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.38);
+  }
+  .btn-cancel-hammer.show {
+    display: inline-flex;
+  }
+  .btn-cancel-hammer:active {
+    transform: scale(0.95);
   }
 
   #canvas-container {
@@ -275,129 +282,249 @@
     height: 100%;
   }
 
+  /* #4 Modern Material 3 Elevated Dialogs */
   .modal-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(20, 9, 2, 0.84);
-    backdrop-filter: blur(4px);
+    background: rgba(15, 7, 2, 0.78);
+    backdrop-filter: blur(6px);
     display: none;
     align-items: center;
     justify-content: center;
     z-index: 50;
     padding: 20px;
+    transition: opacity 0.2s ease, background 0.2s ease;
   }
   .modal-backdrop.show {
     display: flex;
   }
+  .modal-backdrop.peeking {
+    background: rgba(15, 7, 2, 0.1);
+    backdrop-filter: none;
+  }
+  .modal-backdrop.peeking .modal-card {
+    opacity: 0.14;
+    pointer-events: none;
+  }
+
   .modal-card {
-    background: var(--modal-bg);
-    border: 3px solid var(--modal-border);
-    border-radius: 22px;
-    padding: 22px 20px;
+    background: linear-gradient(180deg, var(--modal-surface) 0%, var(--modal-surface-alt) 100%);
+    border: 1px solid var(--modal-outline);
+    border-radius: 28px;
+    padding: 24px 20px 20px 20px;
     width: 100%;
-    max-width: 340px;
+    max-width: 348px;
     text-align: center;
-    box-shadow: 0 16px 40px rgba(0,0,0,0.65), inset 0 2px 4px rgba(255,255,255,0.3);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    transition: opacity 0.2s ease;
+  }
+  .modal-header-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.24);
+    border: 1px solid var(--modal-outline);
+    color: var(--accent-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px auto;
   }
   .modal-badge {
     display: none;
-    background: linear-gradient(180deg, #ffe46b 0%, #e6a817 100%);
-    color: #421f04;
-    font-size: 13px;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    background: var(--accent-primary);
+    color: var(--accent-contrast);
+    font-size: 12px;
     font-weight: 900;
     padding: 5px 14px;
-    border-radius: 20px;
+    border-radius: 99px;
     margin: 0 auto 10px auto;
     width: fit-content;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.35);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
     text-transform: uppercase;
     letter-spacing: 0.6px;
   }
   .modal-badge.show {
-    display: inline-block;
+    display: inline-flex;
   }
   .modal-title {
-    color: #fff3d1;
-    font-size: 25px;
+    color: var(--text-primary);
+    font-size: 22px;
     font-weight: 900;
-    margin-bottom: 6px;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    margin-bottom: 4px;
+    letter-spacing: -0.2px;
   }
   .modal-sub {
-    color: #fce2b6;
+    color: var(--text-secondary);
     font-size: 13px;
-    margin-bottom: 16px;
+    margin-bottom: 18px;
+    opacity: 0.9;
   }
+
   .modal-scores-row {
     display: flex;
     gap: 10px;
-    margin-bottom: 18px;
+    margin-bottom: 14px;
   }
   .modal-score-box {
     flex: 1;
-    background: rgba(35, 15, 4, 0.55);
-    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.26);
+    border-radius: 18px;
     padding: 12px 8px;
-    border: 1px solid rgba(234, 182, 118, 0.4);
+    border: 1px solid var(--modal-outline);
   }
   .modal-score-box.highlight {
-    border-color: #ffe047;
-    background: rgba(75, 34, 8, 0.72);
+    border-color: var(--accent-primary);
+    background: rgba(255, 216, 89, 0.12);
   }
   .modal-score-box div {
-    color: #ffe047;
+    color: var(--accent-primary);
     font-size: 28px;
     font-weight: 900;
     margin-top: 2px;
+    font-variant-numeric: tabular-nums;
   }
   .modal-score-box span {
-    color: #f3d5a5;
+    color: var(--text-secondary);
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.8px;
   }
+
+  .modal-secondary-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .btn-secondary {
+    flex: 1;
+    min-height: 46px;
+    padding: 10px 8px;
+    border-radius: 14px;
+    border: 1px solid var(--modal-outline);
+    background: rgba(0, 0, 0, 0.24);
+    color: var(--text-primary);
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: transform 0.12s ease, background 0.15s ease;
+  }
+  .btn-secondary:active {
+    transform: scale(0.96);
+    background: rgba(0, 0, 0, 0.36);
+  }
+
   .btn-primary {
     width: 100%;
+    min-height: 50px;
     padding: 13px;
-    border-radius: 14px;
-    border: 2px solid #fff0a6;
-    background: linear-gradient(180deg, #f3b340 0%, #c87b16 100%);
-    color: #3d1d05;
-    font-size: 17px;
+    border-radius: 16px;
+    border: none;
+    background: var(--accent-primary);
+    color: var(--accent-contrast);
+    font-size: 16px;
     font-weight: 900;
     cursor: pointer;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.4);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: transform 0.12s ease;
   }
   .btn-primary:active {
     transform: scale(0.97);
   }
 
+  /* Settings Menu Items */
+  .settings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  .settings-btn-row {
+    width: 100%;
+    min-height: 52px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: rgba(0, 0, 0, 0.24);
+    border: 1px solid var(--modal-outline);
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.12s ease;
+  }
+  .settings-btn-row:active {
+    transform: scale(0.98);
+  }
+  .settings-row-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .settings-btn-row.confirm-danger {
+    background: #b8291c;
+    border-color: #ffcfc9;
+    color: #ffffff;
+  }
+  .settings-pill-val {
+    font-size: 12px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 99px;
+    background: rgba(0, 0, 0, 0.28);
+    color: var(--accent-primary);
+  }
+  .settings-btn-row.confirm-danger .settings-pill-val {
+    background: rgba(0, 0, 0, 0.25);
+    color: #ffffff;
+  }
+
+  /* #4 Theme Selector List with Visual Progress Bars */
   .theme-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 9px;
     margin-bottom: 18px;
   }
   .theme-item {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 12px;
-    border-radius: 14px;
-    background: rgba(30, 14, 4, 0.52);
-    border: 2px solid rgba(234, 182, 118, 0.3);
-    color: #fff3d1;
+    flex-direction: column;
+    gap: 8px;
+    padding: 11px 13px;
+    border-radius: 16px;
+    background: rgba(0, 0, 0, 0.24);
+    border: 1.5px solid var(--modal-outline);
+    color: var(--text-primary);
     cursor: pointer;
-    transition: transform 0.12s ease, border-color 0.2s ease;
+    transition: transform 0.12s ease, border-color 0.2s ease, background 0.2s ease;
   }
   .theme-item.selected {
-    border-color: #ffe047;
-    background: rgba(90, 48, 14, 0.75);
+    border-color: var(--accent-primary);
+    background: rgba(255, 216, 89, 0.14);
   }
   .theme-item.locked {
-    opacity: 0.65;
+    opacity: 0.78;
     cursor: not-allowed;
+  }
+  .theme-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
   }
   .theme-left {
     display: flex;
@@ -408,84 +535,125 @@
   .theme-swatch {
     width: 34px;
     height: 34px;
-    border-radius: 9px;
-    border: 2px solid rgba(255,255,255,0.45);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+    border-radius: 10px;
+    border: 1.5px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    flex-shrink: 0;
   }
   .theme-name {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 800;
   }
   .theme-req {
     font-size: 11px;
-    color: #f5d39b;
+    color: var(--text-secondary);
   }
   .theme-status {
-    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
     font-weight: 800;
-    padding: 4px 8px;
-    border-radius: 8px;
-    background: rgba(0,0,0,0.35);
-    color: #ffe047;
+    padding: 4px 9px;
+    border-radius: 99px;
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--accent-primary);
+  }
+  .theme-progress-track {
+    width: 100%;
+    height: 5px;
+    border-radius: 99px;
+    background: rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+  }
+  .theme-progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: var(--accent-primary);
+    transition: width 0.3s ease;
   }
 </style>
 </head>
 <body>
 <div id="app">
+  <!-- #1 & #2 Harmonized Material Header with Vector SVG Icons & Tabular Numerals -->
   <div class="header">
-    <div class="score-box">
-      <svg class="crown-icon" viewBox="0 0 32 24" fill="none">
-        <path d="M2 20L5 6L12 12L16 3L20 12L27 6L30 20H2Z" fill="#703510" stroke="#f5c869" stroke-width="2" stroke-linejoin="round"/>
-      </svg>
-      <div id="score-val">0</div>
-    </div>
-
-    <div class="best-pill" id="best-pill">
-      <span>Rekords</span>
-      <div id="best-val">0</div>
-    </div>
-
-    <div class="combo-wrapper">
-      <div class="combo-label">Combo</div>
-      <div class="combo-box" id="combo-box">
-        <div id="combo-val">0</div>
+    <div class="stat-capsule score-primary">
+      <div class="stat-label">
+        <svg class="m-icon m-icon-sm" viewBox="0 0 24 24"><path d="M3 18h18M4 15l2-9 6 5 6-5 2 9H4z"/></svg>
+        <span>Punkti</span>
       </div>
+      <div class="stat-value" id="score-val">0</div>
     </div>
+
+    <div class="stat-capsule" id="best-pill">
+      <div class="stat-label">
+        <svg class="m-icon m-icon-sm" viewBox="0 0 24 24"><path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z"/></svg>
+        <span>Rekords</span>
+      </div>
+      <div class="stat-value" id="best-val">0</div>
+    </div>
+
+    <div class="stat-capsule" id="combo-box">
+      <div class="stat-label">
+        <svg class="m-icon m-icon-sm" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <span>Combo</span>
+      </div>
+      <div class="stat-value" id="combo-val">0</div>
+    </div>
+
+    <button class="btn-settings" id="settings-btn" aria-label="Izvēlne">
+      <svg class="m-icon m-icon-lg" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
   </div>
 
-  <div class="controls-bar">
-    <div class="powerups-group">
-      <button class="btn-mini btn-powerup" id="undo-btn" title="Atsaukt pēdējo gājienu">
-        ↩ <span class="badge-count" id="undo-count">1</span>
-      </button>
-      <button class="btn-mini btn-powerup" id="hammer-btn" title="Izsist 1 bloku">
-        🔨 <span class="badge-count" id="hammer-count">1</span>
-      </button>
-      <button class="btn-mini btn-powerup" id="reroll-btn" title="Apmainīt 3 figūras">
-        🎲 <span class="badge-count" id="reroll-count">1</span>
-      </button>
-    </div>
-
-    <div class="icon-btns">
-      <button class="btn-mini" id="theme-btn">🎨</button>
-      <button class="btn-mini" id="sound-btn">🔊</button>
-      <button class="btn-mini" id="reset-btn">↺</button>
-    </div>
+  <!-- #2 Clean Vector-Icon Action Bar -->
+  <div class="action-bar">
+    <button class="btn-action" id="undo-btn">
+      <svg class="m-icon" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11"/></svg>
+      <span>Atsaukt</span>
+      <span class="badge-count" id="undo-count">1</span>
+    </button>
+    <button class="btn-action" id="hammer-btn">
+      <svg class="m-icon" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+      <span>Āmurs</span>
+      <span class="badge-count" id="hammer-count">1</span>
+    </button>
+    <button class="btn-action" id="reroll-btn">
+      <svg class="m-icon" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
+      <span>Maiņa</span>
+      <span class="badge-count" id="reroll-count">1</span>
+    </button>
   </div>
 
-  <div class="status-banner" id="status-banner">Pieskaries figūrai apakšā, lai pagrieztu ↻</div>
+  <div class="status-row">
+    <div class="status-banner" id="status-banner">
+      <svg class="m-icon m-icon-sm" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+      <span id="status-text">Pieskaries figūrai apakšā, lai pagrieztu</span>
+    </div>
+    <button class="btn-cancel-hammer" id="cancel-hammer-btn">
+      <svg class="m-icon m-icon-sm" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      <span>Atcelt āmurīti</span>
+    </button>
+  </div>
 
   <div id="canvas-container">
     <canvas id="gameCanvas"></canvas>
   </div>
 </div>
 
-<!-- Game Over Modal -->
+<!-- #4 Material 3 Game Over Modal -->
 <div class="modal-backdrop" id="gameover-modal">
   <div class="modal-card">
-    <div class="modal-badge" id="modal-record-badge">👑 Jauns rekords!</div>
-    <div class="modal-title">Spēle beigusies!</div>
-    <div class="modal-sub">Nav brīvas vietas atlikušajām figūrām.</div>
+    <div class="modal-badge" id="modal-record-badge">
+      <svg class="m-icon m-icon-sm" viewBox="0 0 24 24"><path d="M3 18h18M4 15l2-9 6 5 6-5 2 9H4z"/></svg>
+      <span>Jauns rekords</span>
+    </div>
+    <div class="modal-title">Spēle beigusies</div>
+    <div class="modal-sub">Nav brīvas vietas atlikušajām figūrām</div>
     <div class="modal-scores-row">
       <div class="modal-score-box">
         <span>Rezultāts</span>
@@ -496,17 +664,68 @@
         <div id="final-best">0</div>
       </div>
     </div>
-    <button class="btn-primary" id="modal-restart-btn">Spēlēt vēlreiz</button>
+    <div class="modal-secondary-row">
+      <button class="btn-secondary" id="peek-board-btn">
+        <svg class="m-icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span>Laukums</span>
+      </button>
+      <button class="btn-secondary" id="share-score-btn">
+        <svg class="m-icon" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>
+        <span id="share-btn-label">Dalīties</span>
+      </button>
+    </div>
+    <button class="btn-primary" id="modal-restart-btn">
+      <svg class="m-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3" fill="currentColor" stroke="none"/></svg>
+      <span>Spēlēt vēlreiz</span>
+    </button>
   </div>
 </div>
 
-<!-- Themes Modal -->
+<!-- #4 Material 3 Settings / Menu Modal -->
+<div class="modal-backdrop" id="settings-modal">
+  <div class="modal-card">
+    <div class="modal-header-icon">
+      <svg class="m-icon m-icon-lg" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </div>
+    <div class="modal-title">Izvēlne</div>
+    <div class="modal-sub">Spēles iestatījumi un opcijas</div>
+    <div class="settings-list">
+      <button class="settings-btn-row" id="menu-themes-btn">
+        <span class="settings-row-left">
+          <svg class="m-icon" viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+          <span>Materiālu tēmas</span>
+        </span>
+        <span class="settings-pill-val" id="menu-theme-name">Ozols</span>
+      </button>
+      <button class="settings-btn-row" id="menu-sound-btn">
+        <span class="settings-row-left">
+          <svg class="m-icon" id="menu-sound-icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+          <span>Skaņas efekti</span>
+        </span>
+        <span class="settings-pill-val" id="menu-sound-state">Ieslēgta</span>
+      </button>
+      <button class="settings-btn-row" id="menu-reset-btn">
+        <span class="settings-row-left">
+          <svg class="m-icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          <span id="menu-reset-label">Sākt jaunu spēli</span>
+        </span>
+        <span class="settings-pill-val" id="menu-reset-pill">No nulles</span>
+      </button>
+    </div>
+    <button class="btn-primary" id="close-settings-btn">Turpināt spēli</button>
+  </div>
+</div>
+
+<!-- #4 Material 3 Themes Modal with Visual Progress Bars -->
 <div class="modal-backdrop" id="themes-modal">
   <div class="modal-card">
-    <div class="modal-title">🎨 Materiālu tēmas</div>
-    <div class="modal-sub">Atbloķē jaunas tēmas, uzstādot augstāku rekordu!</div>
+    <div class="modal-title">Materiālu tēmas</div>
+    <div class="modal-sub">Atbloķē jaunas tēmas, uzstādot augstāku rekordu</div>
     <div class="theme-list" id="theme-list"></div>
-    <button class="btn-primary" id="close-themes-btn">Aizvērt</button>
+    <button class="btn-primary" id="close-themes-btn">Atpakaļ</button>
   </div>
 </div>
 
@@ -516,26 +735,33 @@
   const FINGER_OFFSET_Y = 74;
   const TAP_THRESHOLD_PX = 14;
   const TAP_THRESHOLD_MS = 280;
-  const MAGNETIC_SNAP_RATIO = 0.44; // #1 Smart magnetic snap radius (in cell units)
+  const MAGNETIC_SNAP_RATIO = 0.44;
   const STORAGE_BEST_KEY = "koka_bloki_best";
-  const STORAGE_STATE_KEY = "koka_bloki_saved_state_v3";
+  const STORAGE_STATE_KEY = "koka_bloki_saved_state_v5";
   const STORAGE_THEME_KEY = "koka_bloki_theme_v1";
 
+  // #1 Unified Dynamic Color Tokens for each theme
   const THEMES = [
     {
       id: "oak",
       name: "Klasiskais ozols",
+      shortName: "Ozols",
       unlockScore: 0,
       themeColor: "#7b4a26",
-      bgRadial: "radial-gradient(circle at 50% 30%, #c8874b 0%, #8a5228 65%, #5b3315 100%)",
+      bgRadial: "radial-gradient(circle at 50% 25%, #c9884c 0%, #874f26 65%, #562f12 100%)",
       grainColor: "rgba(45, 22, 6, 0.045)",
-      comboLabel: "#4b250b",
-      btnBg: "rgba(58, 29, 10, 0.68)",
-      btnBorder: "#b57b45",
-      modalBg: "linear-gradient(180deg, #b8763e 0%, #7d481e 100%)",
-      modalBorder: "#eab676",
+      surfaceRecessed: "rgba(46, 22, 6, 0.78)",
+      surfaceRecessedBorder: "rgba(235, 186, 122, 0.36)",
+      surfaceElevated: "rgba(62, 31, 10, 0.72)",
+      surfaceElevatedBorder: "rgba(235, 186, 122, 0.34)",
+      accentPrimary: "#ffd859",
+      accentContrast: "#3b1c04",
+      modalSurface: "#693b18",
+      modalSurfaceAlt: "#4d290f",
       boardFrame: "#48240b",
       boardBorder: "#d99e62",
+      dockFrame: "rgba(52, 25, 7, 0.65)",
+      dockSlot: "rgba(32, 14, 3, 0.55)",
       cellEven: "#381b07",
       cellOdd: "#321706",
       blockTop: "#f5cf6b",
@@ -549,17 +775,23 @@
     {
       id: "walnut",
       name: "Tumšais riekstkoks",
+      shortName: "Riekstkoks",
       unlockScore: 800,
       themeColor: "#4a2716",
-      bgRadial: "radial-gradient(circle at 50% 30%, #8c4f32 0%, #592e1a 65%, #36190c 100%)",
+      bgRadial: "radial-gradient(circle at 50% 25%, #8c4f32 0%, #592e1a 65%, #36190c 100%)",
       grainColor: "rgba(25, 10, 4, 0.06)",
-      comboLabel: "#f7d4a8",
-      btnBg: "rgba(38, 16, 7, 0.75)",
-      btnBorder: "#a86442",
-      modalBg: "linear-gradient(180deg, #7d4327 0%, #4d2513 100%)",
-      modalBorder: "#d69472",
+      surfaceRecessed: "rgba(32, 13, 5, 0.82)",
+      surfaceRecessedBorder: "rgba(232, 168, 132, 0.36)",
+      surfaceElevated: "rgba(46, 20, 8, 0.76)",
+      surfaceElevatedBorder: "rgba(232, 168, 132, 0.34)",
+      accentPrimary: "#ffbe85",
+      accentContrast: "#331405",
+      modalSurface: "#5c2f1a",
+      modalSurfaceAlt: "#401e0f",
       boardFrame: "#2b1207",
       boardBorder: "#b87452",
+      dockFrame: "rgba(36, 15, 6, 0.68)",
+      dockSlot: "rgba(20, 8, 3, 0.58)",
       cellEven: "#210d04",
       cellOdd: "#1c0b03",
       blockTop: "#d98a5b",
@@ -573,17 +805,23 @@
     {
       id: "jade",
       name: "Bambuss un nefrīts",
+      shortName: "Nefrīts",
       unlockScore: 2000,
       themeColor: "#285943",
-      bgRadial: "radial-gradient(circle at 50% 30%, #5a9e7c 0%, #336b50 65%, #1c4230 100%)",
+      bgRadial: "radial-gradient(circle at 50% 25%, #5a9e7c 0%, #336b50 65%, #1c4230 100%)",
       grainColor: "rgba(12, 36, 24, 0.05)",
-      comboLabel: "#e2f7eb",
-      btnBg: "rgba(18, 48, 34, 0.72)",
-      btnBorder: "#78c29d",
-      modalBg: "linear-gradient(180deg, #438564 0%, #24523b 100%)",
-      modalBorder: "#9ee0be",
+      surfaceRecessed: "rgba(15, 42, 29, 0.8)",
+      surfaceRecessedBorder: "rgba(158, 232, 194, 0.36)",
+      surfaceElevated: "rgba(22, 56, 40, 0.75)",
+      surfaceElevatedBorder: "rgba(158, 232, 194, 0.34)",
+      accentPrimary: "#9cf5c7",
+      accentContrast: "#0d3320",
+      modalSurface: "#2d6148",
+      modalSurfaceAlt: "#1d4532",
       boardFrame: "#163626",
       boardBorder: "#82cca7",
+      dockFrame: "rgba(18, 46, 32, 0.65)",
+      dockSlot: "rgba(10, 28, 19, 0.55)",
       cellEven: "#112b1e",
       cellOdd: "#0e2419",
       blockTop: "#8be8b8",
@@ -597,17 +835,23 @@
     {
       id: "midnight",
       name: "Nakts melnkoks",
+      shortName: "Melnkoks",
       unlockScore: 4000,
       themeColor: "#1f2436",
-      bgRadial: "radial-gradient(circle at 50% 30%, #3d4663 0%, #222738 65%, #121521 100%)",
+      bgRadial: "radial-gradient(circle at 50% 25%, #3d4663 0%, #222738 65%, #121521 100%)",
       grainColor: "rgba(0, 0, 0, 0.08)",
-      comboLabel: "#d9e2ff",
-      btnBg: "rgba(16, 19, 31, 0.78)",
-      btnBorder: "#6c7ba8",
-      modalBg: "linear-gradient(180deg, #323952 0%, #1b1f2e 100%)",
-      modalBorder: "#8696c7",
+      surfaceRecessed: "rgba(14, 17, 28, 0.84)",
+      surfaceRecessedBorder: "rgba(154, 174, 224, 0.34)",
+      surfaceElevated: "rgba(24, 29, 46, 0.78)",
+      surfaceElevatedBorder: "rgba(154, 174, 224, 0.32)",
+      accentPrimary: "#ffd966",
+      accentContrast: "#291a03",
+      modalSurface: "#2a3045",
+      modalSurfaceAlt: "#1b1f2e",
       boardFrame: "#10131f",
       boardBorder: "#6e7eab",
+      dockFrame: "rgba(15, 18, 30, 0.7)",
+      dockSlot: "rgba(9, 11, 20, 0.62)",
       cellEven: "#171b2b",
       cellOdd: "#131724",
       blockTop: "#ffd66b",
@@ -639,12 +883,16 @@
     const root = document.documentElement.style;
     root.setProperty("--bg-radial", t.bgRadial);
     root.setProperty("--grain-color", t.grainColor);
-    root.setProperty("--combo-label", t.comboLabel);
-    root.setProperty("--btn-bg", t.btnBg);
-    root.setProperty("--btn-border", t.btnBorder);
-    root.setProperty("--modal-bg", t.modalBg);
-    root.setProperty("--modal-border", t.modalBorder);
+    root.setProperty("--surface-recessed", t.surfaceRecessed);
+    root.setProperty("--surface-recessed-border", t.surfaceRecessedBorder);
+    root.setProperty("--surface-elevated", t.surfaceElevated);
+    root.setProperty("--surface-elevated-border", t.surfaceElevatedBorder);
+    root.setProperty("--accent-primary", t.accentPrimary);
+    root.setProperty("--accent-contrast", t.accentContrast);
+    root.setProperty("--modal-surface", t.modalSurface);
+    root.setProperty("--modal-surface-alt", t.modalSurfaceAlt);
     document.getElementById("meta-theme-color").setAttribute("content", t.themeColor);
+    document.getElementById("menu-theme-name").textContent = t.shortName;
     updateDynamicFavicon(t);
   }
 
@@ -756,6 +1004,14 @@
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
       osc.start(now);
       osc.stop(now + 0.15);
+    } else if (type === "bump") {
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(125, now);
+      osc.frequency.exponentialRampToValueAtTime(75, now + 0.08);
+      gain.gain.setValueAtTime(0.16, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+      osc.start(now);
+      osc.stop(now + 0.09);
     } else if (type === "clear") {
       const freqs = [440, 554.37, 659.25, 880];
       freqs.forEach((f, idx) => {
@@ -806,6 +1062,7 @@
   let grid = Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(0));
   let tray = [null, null, null];
   let score = 0;
+  let displayedScore = 0; // #3 Smooth roll-up score counter
   let bestScore = parseInt(localStorage.getItem(STORAGE_BEST_KEY) || "0", 10);
   let newRecordCelebrated = false;
   let isGameOver = false;
@@ -813,9 +1070,10 @@
 
   let hammers = 1;
   let rerolls = 1;
-  let undos = 1; // #3 Undo 1x per game (+ earnable on Combo x3)
+  let undos = 1;
   let undoSnapshot = null;
   let hammerArmed = false;
+  let boardShakeTimer = 0;
 
   let particles = [];
   let floatingTexts = [];
@@ -879,6 +1137,7 @@
         animScale: 1
       } : null);
       score = parsed.score || 0;
+      displayedScore = score;
       combo = parsed.combo || 0;
       hammers = typeof parsed.hammers === "number" ? parsed.hammers : 1;
       rerolls = typeof parsed.rerolls === "number" ? parsed.rerolls : 1;
@@ -933,11 +1192,8 @@
     }
   }
 
-  function setStatusMessage(msg, isHammer = false) {
-    const banner = document.getElementById("status-banner");
-    banner.textContent = msg;
-    if (isHammer) banner.classList.add("hammer-mode");
-    else banner.classList.remove("hammer-mode");
+  function setStatusMessage(msg) {
+    document.getElementById("status-text").textContent = msg;
   }
 
   function celebrateNewRecord() {
@@ -949,13 +1205,12 @@
     setTimeout(() => bestPill.classList.remove("record-broken"), 1400);
 
     if (boardSize > 0) {
-      addFloatingText(boardX + boardSize / 2, boardY + boardSize * 0.32, "👑 Jauns rekords!");
+      addFloatingText(boardX + boardSize / 2, boardY + boardSize * 0.32, "Jauns rekords!");
       spawnParticles(boardX + boardSize / 2, boardY + boardSize * 0.32, 24);
     }
   }
 
   function updateUI() {
-    document.getElementById("score-val").textContent = score;
     const hadPreviousBest = bestScore > 0;
     if (score > bestScore) {
       bestScore = score;
@@ -970,8 +1225,8 @@
     document.getElementById("combo-val").textContent = combo;
 
     const comboBox = document.getElementById("combo-box");
-    if (combo > 0) comboBox.classList.add("active");
-    else comboBox.classList.remove("active");
+    if (combo > 0) comboBox.classList.add("combo-active");
+    else comboBox.classList.remove("combo-active");
 
     document.getElementById("undo-count").textContent = undos;
     document.getElementById("hammer-count").textContent = hammers;
@@ -987,10 +1242,15 @@
     const rerollBtn = document.getElementById("reroll-btn");
     rerollBtn.classList.toggle("empty", rerolls <= 0);
 
+    const statusBanner = document.getElementById("status-banner");
+    const cancelHammerBtn = document.getElementById("cancel-hammer-btn");
     if (hammerArmed) {
-      setStatusMessage("🔨 Pieskaries jebkuram blokam uz laukuma, lai to izsistu!", true);
+      statusBanner.style.display = "none";
+      cancelHammerBtn.classList.add("show");
     } else {
-      setStatusMessage("Pieskaries figūrai apakšā, lai pagrieztu ↻", false);
+      statusBanner.style.display = "inline-flex";
+      cancelHammerBtn.classList.remove("show");
+      setStatusMessage("Pieskaries figūrai apakšā, lai pagrieztu");
     }
   }
 
@@ -1043,7 +1303,9 @@
       badge.classList.remove("show");
       bestBox.classList.remove("highlight");
     }
-    document.getElementById("gameover-modal").classList.add("show");
+    const modal = document.getElementById("gameover-modal");
+    modal.classList.remove("peeking");
+    modal.classList.add("show");
   }
 
   function checkGameOver() {
@@ -1142,13 +1404,13 @@
       if (combo >= 3 && combo % 3 === 0) {
         if (hammers <= rerolls && hammers <= undos) {
           hammers = Math.min(3, hammers + 1);
-          bonusText = " (+1 🔨)";
+          bonusText = " (+1 Āmurs)";
         } else if (rerolls <= undos) {
           rerolls = Math.min(3, rerolls + 1);
-          bonusText = " (+1 🎲)";
+          bonusText = " (+1 Maiņa)";
         } else {
           undos = Math.min(3, undos + 1);
-          bonusText = " (+1 ↩)";
+          bonusText = " (+1 Atsaukt)";
         }
       }
 
@@ -1164,7 +1426,7 @@
             10
           );
         }
-        addFloatingText(boardX + boardSize / 2, boardY + boardSize * 0.45, `✨ TĪRS LAUKUMS! +${boardClearBonus}`);
+        addFloatingText(boardX + boardSize / 2, boardY + boardSize * 0.45, `TĪRS LAUKUMS! +${boardClearBonus}`);
         addFloatingText(boardX + boardSize / 2, boardY + boardSize * 0.62, `+${gained}${bonusText}`);
       } else {
         playWoodSound("clear");
@@ -1182,7 +1444,6 @@
     checkGameOver();
   }
 
-  // #1 Smart Magnetic Snapping: finds exact match or closest valid cell within MAGNETIC_SNAP_RATIO
   function getDropGridPos() {
     if (!dragState) return null;
     const piece = tray[dragState.index];
@@ -1206,7 +1467,6 @@
       return { row: roundRow, col: roundCol };
     }
 
-    // Magnetic search among neighboring cells if slightly off in moving train
     let bestCandidate = null;
     let bestDist = MAGNETIC_SNAP_RATIO;
 
@@ -1227,7 +1487,6 @@
     return bestCandidate;
   }
 
-  // #2 Line Clear Preview: computes which rows & cols will clear if piece is placed at dropPos
   function getPreviewClearedLines(piece, dropPos) {
     if (!piece || !dropPos) return { rows: new Set(), cols: new Set() };
 
@@ -1327,15 +1586,56 @@
   }
 
   function getTraySlotCenter(index) {
-    const slotW = width / 3;
+    const innerX = boardX - 8;
+    const innerW = boardSize + 16;
+    const slotW = innerW / 3;
     return {
-      x: slotW * index + slotW / 2,
-      y: trayY + trayHeight * 0.48
+      x: innerX + slotW * index + slotW / 2,
+      y: trayY + trayHeight * 0.5
     };
+  }
+
+  // #5 Draw crisp vector Material rotation badge in top-right corner of rotatable slot
+  function drawRotateBadge(cx, cy, t) {
+    ctx.save();
+    ctx.fillStyle = t.surfaceRecessed;
+    ctx.strokeStyle = t.surfaceRecessedBorder;
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 11, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // Vector circular arrow inside badge
+    ctx.strokeStyle = t.accentPrimary;
+    ctx.lineWidth = 1.8;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.arc(cx, cy, 5, -Math.PI * 0.75, Math.PI * 0.65);
+    ctx.stroke();
+
+    // Arrowhead
+    const tipX = cx + 5 * Math.cos(-Math.PI * 0.75);
+    const tipY = cy + 5 * Math.sin(-Math.PI * 0.75);
+    ctx.beginPath();
+    ctx.moveTo(tipX - 2.5, tipY - 0.5);
+    ctx.lineTo(tipX, tipY);
+    ctx.lineTo(tipX + 0.5, tipY + 2.8);
+    ctx.stroke();
+    ctx.restore();
   }
 
   function draw() {
     const t = getActiveTheme();
+
+    // #3 Smooth roll-up score counter animation
+    if (displayedScore !== score) {
+      const diff = score - displayedScore;
+      const step = Math.sign(diff) * Math.max(1, Math.ceil(Math.abs(diff) * 0.22));
+      displayedScore += step;
+      document.getElementById("score-val").textContent = displayedScore;
+    }
+
     ctx.clearRect(0, 0, width, height);
 
     const dropPos = (dragState && dragState.isDragging) ? getDropGridPos() : null;
@@ -1343,26 +1643,33 @@
     const previewLines = getPreviewClearedLines(activePiece, dropPos);
     const hasLineHighlight = previewLines.rows.size > 0 || previewLines.cols.size > 0;
 
+    let shakeOffsetX = 0;
+    if (boardShakeTimer > 0) {
+      shakeOffsetX = Math.sin(boardShakeTimer * 45) * 6 * boardShakeTimer;
+      boardShakeTimer = Math.max(0, boardShakeTimer - 0.06);
+    }
+
+    const bxBase = boardX + shakeOffsetX;
     const framePad = 8;
     ctx.save();
     ctx.fillStyle = t.boardFrame;
-    ctx.strokeStyle = hammerArmed ? "#ffe047" : t.boardBorder;
-    ctx.lineWidth = hammerArmed ? 3.5 : 3;
-    roundRect(ctx, boardX - framePad, boardY - framePad, boardSize + framePad * 2, boardSize + framePad * 2, 16);
+    ctx.strokeStyle = hammerArmed ? t.accentPrimary : t.boardBorder;
+    ctx.lineWidth = hammerArmed ? 3 : 2.5;
+    roundRect(ctx, bxBase - framePad, boardY - framePad, boardSize + framePad * 2, boardSize + framePad * 2, 18);
     ctx.fill();
     ctx.stroke();
     ctx.restore();
 
     for (let r = 0; r < GRID_SIZE; r++) {
       for (let c = 0; c < GRID_SIZE; c++) {
-        const cx = boardX + c * cellSize;
+        const cx = bxBase + c * cellSize;
         const cy = boardY + r * cellSize;
         const pad = 2;
         ctx.fillStyle = (r + c) % 2 === 0 ? t.cellEven : t.cellOdd;
         roundRect(ctx, cx + pad, cy + pad, cellSize - pad * 2, cellSize - pad * 2, 5);
         ctx.fill();
 
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.07)";
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.06)";
         ctx.lineWidth = 1;
         ctx.stroke();
 
@@ -1381,7 +1688,7 @@
             const gc = dropPos.col + c;
             const highlightGhost = previewLines.rows.has(gr) || previewLines.cols.has(gc);
             drawWoodBlock(
-              boardX + gc * cellSize,
+              bxBase + gc * cellSize,
               boardY + gr * cellSize,
               cellSize,
               1,
@@ -1401,7 +1708,7 @@
       ctx.fillStyle = "#fff6bd";
       roundRect(
         ctx,
-        boardX + fc.c * cellSize + 2,
+        bxBase + fc.c * cellSize + 2,
         boardY + fc.r * cellSize + 2,
         cellSize - 4,
         cellSize - 4,
@@ -1413,21 +1720,33 @@
       if (fc.life <= 0) flashCells.splice(i, 1);
     }
 
-    // #5 Thumb-Zone Ergonomics: subtle visual touch-slot containers so player sees full 1/3 thumb hit-area
-    const slotW = width / 3;
+    // #5 Recessed Wooden Dock Tray at bottom with individual carved slots
+    const dockX = boardX - framePad;
+    const dockW = boardSize + framePad * 2;
+    ctx.save();
+    ctx.fillStyle = t.dockFrame;
+    ctx.strokeStyle = t.surfaceRecessedBorder;
+    ctx.lineWidth = 1.5;
+    roundRect(ctx, dockX, trayY, dockW, trayHeight, 18);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
+    const slotGap = 8;
+    const slotInnerW = (dockW - slotGap * 4) / 3;
+    const slotInnerH = trayHeight - slotGap * 2;
+
     for (let i = 0; i < 3; i++) {
-      const slotPad = 5;
+      const sx = dockX + slotGap + i * (slotInnerW + slotGap);
+      const sy = trayY + slotGap;
       ctx.save();
-      ctx.fillStyle = "rgba(20, 9, 2, 0.16)";
-      ctx.strokeStyle = "rgba(255, 235, 195, 0.12)";
-      ctx.lineWidth = 1;
-      roundRect(ctx, i * slotW + slotPad, trayY, slotW - slotPad * 2, trayHeight, 14);
+      ctx.fillStyle = t.dockSlot;
+      roundRect(ctx, sx, sy, slotInnerW, slotInnerH, 13);
       ctx.fill();
-      ctx.stroke();
       ctx.restore();
     }
 
-    const miniCell = Math.min(cellSize * 0.56, (width / 3 - 26) / 5);
+    const miniCell = Math.min(cellSize * 0.54, (slotInnerW - 18) / 5);
     for (let i = 0; i < 3; i++) {
       const piece = tray[i];
       if (!piece) continue;
@@ -1454,25 +1773,17 @@
               startX + c * miniCell * scale,
               startY + r * miniCell * scale,
               miniCell * scale,
-              hammerArmed ? 0.55 : 1
+              hammerArmed ? 0.45 : 1
             );
           }
         }
       }
 
+      // #5 Top-right circular Material badge for rotatable pieces
       if (piece.rotatable && !hammerArmed) {
-        ctx.save();
-        const badgeX = center.x;
-        const badgeY = trayY + trayHeight - 13;
-        ctx.fillStyle = "rgba(25, 12, 4, 0.55)";
-        roundRect(ctx, badgeX - 13, badgeY - 10, 26, 18, 9);
-        ctx.fill();
-        ctx.fillStyle = "#ffe5a3";
-        ctx.font = "bold 12px sans-serif";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText("↻", badgeX, badgeY - 1);
-        ctx.restore();
+        const sx = dockX + slotGap + i * (slotInnerW + slotGap);
+        const sy = trayY + slotGap;
+        drawRotateBadge(sx + slotInnerW - 15, sy + 15, t);
       }
     }
 
@@ -1522,12 +1833,12 @@
       const ft = floatingTexts[i];
       ctx.save();
       ctx.globalAlpha = Math.max(0, ft.life);
-      ctx.font = "900 24px sans-serif";
+      ctx.font = "900 22px -apple-system, BlinkMacSystemFont, sans-serif";
       ctx.textAlign = "center";
       ctx.strokeStyle = "#261003";
       ctx.lineWidth = 5;
       ctx.strokeText(ft.text, ft.x, ft.y);
-      ctx.fillStyle = "#ffe552";
+      ctx.fillStyle = t.accentPrimary;
       ctx.fillText(ft.text, ft.x, ft.y);
       ctx.restore();
 
@@ -1559,28 +1870,36 @@
     ) {
       const col = Math.floor((pos.x - boardX) / cellSize);
       const row = Math.floor((pos.y - boardY) / cellSize);
-      if (row >= 0 && row < GRID_SIZE && col >= 0 && col < GRID_SIZE && grid[row][col] === 1) {
-        undoSnapshot = createSnapshot();
-        grid[row][col] = 0;
-        hammers--;
-        hammerArmed = false;
-        playWoodSound("hammer");
-        vibrate([35, 25, 35]);
+      if (row >= 0 && row < GRID_SIZE && col >= 0 && col < GRID_SIZE) {
+        if (grid[row][col] === 1) {
+          undoSnapshot = createSnapshot();
+          grid[row][col] = 0;
+          hammers--;
+          hammerArmed = false;
+          playWoodSound("hammer");
+          vibrate([35, 25, 35]);
 
-        const px = boardX + (col + 0.5) * cellSize;
-        const py = boardY + (row + 0.5) * cellSize;
-        spawnParticles(px, py, 16);
-        flashCells.push({ r: row, c: col, life: 1.0 });
+          const px = boardX + (col + 0.5) * cellSize;
+          const py = boardY + (row + 0.5) * cellSize;
+          spawnParticles(px, py, 16);
+          flashCells.push({ r: row, c: col, life: 1.0 });
 
-        if (isBoardCompletelyEmpty()) {
-          score += 300;
-          addFloatingText(boardX + boardSize / 2, boardY + boardSize / 2, "✨ TĪRS LAUKUMS! +300");
+          if (isBoardCompletelyEmpty()) {
+            score += 300;
+            addFloatingText(boardX + boardSize / 2, boardY + boardSize / 2, "TĪRS LAUKUMS! +300");
+          }
+
+          updateUI();
+          saveGameState();
+          checkGameOver();
+          return true;
+        } else {
+          boardShakeTimer = 1.0;
+          playWoodSound("bump");
+          vibrate([25, 35, 25]);
+          addFloatingText(pos.x, pos.y - 12, "Izvēlies koka bloku!");
+          return true;
         }
-
-        updateUI();
-        saveGameState();
-        checkGameOver();
-        return true;
       }
     }
     return false;
@@ -1592,16 +1911,11 @@
     const pos = getCanvasCoords(e);
 
     if (hammerArmed) {
-      if (handleHammerClick(pos)) return;
-      if (pos.y >= trayY - 12) {
-        hammerArmed = false;
-        updateUI();
-      }
+      handleHammerClick(pos);
       return;
     }
 
-    // #5 Thumb-Zone Ergonomics: entire 1/3 bottom slot responds to touch
-    if (pos.y >= trayY - 14) {
+    if (pos.y >= trayY - 12) {
       const slotIndex = Math.max(0, Math.min(2, Math.floor(pos.x / (width / 3))));
       if (tray[slotIndex] !== null) {
         dragState = {
@@ -1636,7 +1950,6 @@
       dragState.currentX = pos.x;
       dragState.currentY = pos.y - FINGER_OFFSET_Y;
 
-      // #4 Tactile Micro-Haptics: subtle 6ms tick each time the piece snaps onto a new grid cell
       const dropPos = getDropGridPos();
       const snapKey = dropPos ? `${dropPos.row},${dropPos.col}` : null;
       if (snapKey !== dragState.lastSnapKey) {
@@ -1684,11 +1997,10 @@
   window.addEventListener("mousemove", onPointerMove);
   window.addEventListener("mouseup", onPointerUp);
 
-  // #3 Undo 1x Button
   document.getElementById("undo-btn").addEventListener("click", () => {
     ensureAudio();
     if (undos <= 0 || !undoSnapshot) {
-      setStatusMessage("↩ Nav pieejama gājiena atsaukšana!", false);
+      setStatusMessage("Nav pieejama gājiena atsaukšana");
       vibrate(30);
       return;
     }
@@ -1701,6 +2013,8 @@
       animScale: 0.82
     } : null);
     score = undoSnapshot.score;
+    displayedScore = score;
+    document.getElementById("score-val").textContent = displayedScore;
     combo = undoSnapshot.combo;
     hammers = undoSnapshot.hammers;
     rerolls = undoSnapshot.rerolls;
@@ -1708,7 +2022,7 @@
 
     playWoodSound("undo");
     vibrate([15, 25, 15]);
-    addFloatingText(boardX + boardSize / 2, boardY + boardSize * 0.5, "↩ Gājiens atsaukts");
+    addFloatingText(boardX + boardSize / 2, boardY + boardSize * 0.5, "Gājiens atsaukts");
     updateUI();
     saveGameState();
   });
@@ -1716,13 +2030,13 @@
   document.getElementById("hammer-btn").addEventListener("click", () => {
     ensureAudio();
     if (hammers <= 0) {
-      setStatusMessage("🔨 Nav āmurīšu! Savāc Combo x3, lai nopelnītu.", false);
+      setStatusMessage("Nav āmurīšu! Savāc Combo x3, lai nopelnītu");
       vibrate(30);
       return;
     }
     const hasBlocks = grid.some(row => row.some(cell => cell === 1));
     if (!hasBlocks) {
-      setStatusMessage("Laukums jau ir tukšs!", false);
+      setStatusMessage("Laukums jau ir tukšs");
       return;
     }
     hammerArmed = !hammerArmed;
@@ -1730,10 +2044,16 @@
     updateUI();
   });
 
+  document.getElementById("cancel-hammer-btn").addEventListener("click", () => {
+    hammerArmed = false;
+    playWoodSound("rotate");
+    updateUI();
+  });
+
   document.getElementById("reroll-btn").addEventListener("click", () => {
     ensureAudio();
     if (rerolls <= 0) {
-      setStatusMessage("🎲 Nav maiņas žetonu! Savāc Combo x3, lai nopelnītu.", false);
+      setStatusMessage("Nav maiņas žetonu! Savāc Combo x3, lai nopelnītu");
       vibrate(30);
       return;
     }
@@ -1749,26 +2069,100 @@
     checkGameOver();
   });
 
+  // Settings Modal & Safe 2-step Reset Confirmation
+  let resetConfirmTimeout = null;
+  let resetConfirmArmed = false;
+
+  function disarmResetConfirm() {
+    resetConfirmArmed = false;
+    if (resetConfirmTimeout) {
+      clearTimeout(resetConfirmTimeout);
+      resetConfirmTimeout = null;
+    }
+    const btn = document.getElementById("menu-reset-btn");
+    btn.classList.remove("confirm-danger");
+    document.getElementById("menu-reset-label").textContent = "Sākt jaunu spēli";
+    document.getElementById("menu-reset-pill").textContent = "No nulles";
+  }
+
+  document.getElementById("settings-btn").addEventListener("click", () => {
+    ensureAudio();
+    hammerArmed = false;
+    updateUI();
+    disarmResetConfirm();
+    document.getElementById("menu-sound-state").textContent = soundEnabled ? "Ieslēgta" : "Izslēgta";
+    document.getElementById("settings-modal").classList.add("show");
+  });
+
+  document.getElementById("close-settings-btn").addEventListener("click", () => {
+    disarmResetConfirm();
+    document.getElementById("settings-modal").classList.remove("show");
+  });
+
+  document.getElementById("menu-sound-btn").addEventListener("click", () => {
+    soundEnabled = !soundEnabled;
+    document.getElementById("menu-sound-state").textContent = soundEnabled ? "Ieslēgta" : "Izslēgta";
+    if (soundEnabled) playWoodSound("rotate");
+  });
+
+  document.getElementById("menu-reset-btn").addEventListener("click", () => {
+    if (score === 0) {
+      disarmResetConfirm();
+      document.getElementById("settings-modal").classList.remove("show");
+      startNewGame();
+      return;
+    }
+
+    if (!resetConfirmArmed) {
+      resetConfirmArmed = true;
+      vibrate(25);
+      const btn = document.getElementById("menu-reset-btn");
+      btn.classList.add("confirm-danger");
+      document.getElementById("menu-reset-label").textContent = "Vai tiešām dzēst?";
+      document.getElementById("menu-reset-pill").textContent = "Spied vēlreiz";
+      resetConfirmTimeout = setTimeout(disarmResetConfirm, 3500);
+    } else {
+      disarmResetConfirm();
+      document.getElementById("settings-modal").classList.remove("show");
+      startNewGame();
+    }
+  });
+
+  // #4 Material 3 Themes Modal with Visual Progress Bars
   function renderThemesList() {
     const list = document.getElementById("theme-list");
     list.innerHTML = "";
     THEMES.forEach(theme => {
       const unlocked = bestScore >= theme.unlockScore;
       const isSelected = theme.id === currentThemeId;
+      const pct = theme.unlockScore > 0 ? Math.min(100, Math.round((bestScore / theme.unlockScore) * 100)) : 100;
 
       const item = document.createElement("div");
       item.className = "theme-item" + (isSelected ? " selected" : "") + (!unlocked ? " locked" : "");
 
       const swatchGrad = `linear-gradient(135deg, ${theme.blockTop}, ${theme.blockBot})`;
+      const statusHtml = isSelected
+        ? `<svg class="m-icon m-icon-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>Aktīva</span>`
+        : (unlocked
+            ? `<span>Izvēlēties</span>`
+            : `<svg class="m-icon m-icon-sm" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>${theme.unlockScore}</span>`);
+
+      const progressHtml = !unlocked
+        ? `<div class="theme-progress-track"><div class="theme-progress-fill" style="width: ${pct}%;"></div></div>`
+        : "";
+
       item.innerHTML = `
-        <div class="theme-left">
-          <div class="theme-swatch" style="background: ${swatchGrad};"></div>
-          <div>
-            <div class="theme-name">${theme.name}</div>
-            <div class="theme-req">${unlocked ? "Atbloķēts" : `Nepieciešams rekords: ${theme.unlockScore} p.`}</div>
+        <div class="theme-top-row">
+          <div class="theme-left">
+            <div class="theme-swatch" style="background: ${swatchGrad};"></div>
+            <div>
+              <div class="theme-name">${theme.name}</div>
+              <div class="theme-req">${unlocked ? "Atbloķēts" : `Rekords: ${bestScore} / ${theme.unlockScore} p. (${pct}%)`}</div>
+            </div>
           </div>
+          <div class="theme-status">${statusHtml}</div>
         </div>
-        <div class="theme-status">${isSelected ? "✓ Aktīva" : (unlocked ? "Izvēlēties" : "🔒")}</div>
+        ${progressHtml}
       `;
 
       if (unlocked) {
@@ -1787,11 +2181,12 @@
     hammerArmed = false;
     updateUI();
     renderThemesList();
+    document.getElementById("settings-modal").classList.remove("show");
     document.getElementById("themes-modal").classList.add("show");
   }
 
-  document.getElementById("theme-btn").addEventListener("click", () => {
-    ensureAudio();
+  document.getElementById("menu-themes-btn").addEventListener("click", () => {
+    disarmResetConfirm();
     openThemesModal();
   });
 
@@ -1799,10 +2194,51 @@
     document.getElementById("themes-modal").classList.remove("show");
   });
 
+  // Peek Board & Share Score
+  const peekBtn = document.getElementById("peek-board-btn");
+  const gameOverModal = document.getElementById("gameover-modal");
+
+  function startPeek(e) {
+    if (e.cancelable) e.preventDefault();
+    gameOverModal.classList.add("peeking");
+  }
+  function stopPeek() {
+    gameOverModal.classList.remove("peeking");
+  }
+
+  peekBtn.addEventListener("touchstart", startPeek, { passive: false });
+  peekBtn.addEventListener("touchend", stopPeek);
+  peekBtn.addEventListener("touchcancel", stopPeek);
+  peekBtn.addEventListener("mousedown", startPeek);
+  window.addEventListener("mouseup", stopPeek);
+
+  document.getElementById("share-score-btn").addEventListener("click", async () => {
+    const shareText = `Es savācu ${score} punktus spēlē Koka Bloki! (Mans rekords: ${bestScore} p.) Vari pārspēt?`;
+    const shareUrl = window.location.href.split("?")[0];
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Koka Bloki",
+          text: shareText,
+          url: shareUrl
+        });
+      } catch (e) {}
+    } else if (navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
+        const lbl = document.getElementById("share-btn-label");
+        lbl.textContent = "Nokopēts";
+        setTimeout(() => { lbl.textContent = "Dalīties"; }, 2000);
+      } catch (e) {}
+    }
+  });
+
   function startNewGame() {
     grid = Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(0));
     tray = [randomPiece(), randomPiece(), randomPiece()];
     score = 0;
+    displayedScore = 0;
+    document.getElementById("score-val").textContent = "0";
     combo = 0;
     hammers = 1;
     rerolls = 1;
@@ -1816,17 +2252,12 @@
     flashCells = [];
     dragState = null;
     document.getElementById("gameover-modal").classList.remove("show");
+    document.getElementById("gameover-modal").classList.remove("peeking");
     updateUI();
     saveGameState();
   }
 
-  document.getElementById("reset-btn").addEventListener("click", startNewGame);
   document.getElementById("modal-restart-btn").addEventListener("click", startNewGame);
-
-  document.getElementById("sound-btn").addEventListener("click", () => {
-    soundEnabled = !soundEnabled;
-    document.getElementById("sound-btn").textContent = soundEnabled ? "🔊" : "🔇";
-  });
 
   window.addEventListener("beforeunload", saveGameState);
   document.addEventListener("visibilitychange", () => {
@@ -1850,6 +2281,7 @@
     window.history.replaceState({}, document.title, "./index.html");
   } else {
     if (loadGameState()) {
+      document.getElementById("score-val").textContent = displayedScore;
       updateUI();
       checkGameOver();
     } else {

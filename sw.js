@@ -1,4 +1,4 @@
-const CACHE_NAME = 'koka-bloki-v7-ux-pro';
+const CACHE_NAME = 'koka-bloki-v9-material-ui';
 const ASSETS = [
   './',
   './index.html',
