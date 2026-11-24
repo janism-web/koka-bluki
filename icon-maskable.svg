@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#5BC0EB"/>
+  <rect x="92" y="92" width="328" height="328" rx="68" fill="#3A9BC7" stroke="#1E1B18" stroke-width="14"/>
+  <!-- Top-left tile "15" -->
+  <rect x="116" y="116" width="130" height="130" rx="28" fill="#FFD13B" stroke="#1E1B18" stroke-width="13"/>
+  <path d="M144 166 L158 154 L158 208 M145 208 L171 208" fill="none" stroke="#1E1B18" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M216 154 L191 154 L189 176 C196 173 216 173 216 191 C216 206 199 211 186 203" fill="none" stroke="#1E1B18" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Top-right star tile -->
+  <rect x="266" y="116" width="130" height="130" rx="28" fill="#34D399" stroke="#1E1B18" stroke-width="13"/>
+  <path d="M331 146 l9 18 l20 3 l-14 14 l3 20 l-18 -9 l-18 9 l3 -20 l-14 -14 l20 -3 z" fill="#FFD13B" stroke="#1E1B18" stroke-width="6" stroke-linejoin="round"/>
+  <!-- Bottom-left block -->
+  <rect x="116" y="266" width="130" height="130" rx="28" fill="#FF9F87" stroke="#1E1B18" stroke-width="13"/>
+  <rect x="146" y="296" width="70" height="70" rx="14" fill="#FFD859" stroke="#1E1B18" stroke-width="10"/>
+  <!-- Bottom-right wooden block -->
+  <rect x="266" y="266" width="130" height="130" rx="28" fill="#C9884C" stroke="#1E1B18" stroke-width="13"/>
+  <rect x="296" y="296" width="70" height="70" rx="14" fill="#FFD859" stroke="#1E1B18" stroke-width="10"/>
+</svg>

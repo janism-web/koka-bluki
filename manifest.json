@@ -1,71 +1,60 @@
 {
   "id": "./index.html",
-  "name": "Koka Bloki",
-  "short_name": "Koka Bloki",
-  "description": "Klasiska koka bloku mīklu spēle braucieniem un brīvam brīdim",
+  "name": "Spēļu kaste",
+  "short_name": "Spēļu kaste",
+  "description": "Spēle 15 un Koka Bloki vienā bezsaistes spēļu kolekcijā",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#e1e5eb",
-  "theme_color": "#7b4a26",
+  "background_color": "#FFF3B0",
+  "theme_color": "#FFF3B0",
+  "lang": "lv",
   "categories": ["games", "puzzle"],
   "icons": [
     {
-      "src": "./icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "./icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "./icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
+      "src": "./icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "maskable"
     },
     {
-      "src": "./icon-mono-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "monochrome"
-    },
-    {
-      "src": "./icon-mono-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
+      "src": "./icon-monochrome.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "monochrome"
     }
   ],
   "shortcuts": [
     {
-      "name": "Jauna spēle",
-      "short_name": "Jauna",
-      "description": "Sākt jaunu spēles partiju no nulles",
-      "url": "./index.html?action=new",
+      "name": "Spēle 15",
+      "short_name": "Spēle 15",
+      "description": "Atvērt Spēli 15",
+      "url": "./spele15.html",
       "icons": [
         {
-          "src": "./shortcut-new.png",
-          "sizes": "192x192",
-          "type": "image/png"
+          "src": "./icon.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
         }
       ]
     },
     {
-      "name": "Materiālu tēmas",
-      "short_name": "Tēmas",
-      "description": "Izvēlēties koka vai nefrīta tēmu",
-      "url": "./index.html?action=themes",
+      "name": "Koka Bloki",
+      "short_name": "Koka Bloki",
+      "description": "Atvērt Koka Blokus",
+      "url": "./koka-bloki.html",
       "icons": [
         {
-          "src": "./shortcut-themes.png",
-          "sizes": "192x192",
-          "type": "image/png"
+          "src": "./icon.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
         }
       ]
     }

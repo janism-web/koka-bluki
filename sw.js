@@ -1,14 +1,13 @@
-const CACHE_NAME = 'koka-bloki-v11-dynamic-scale';
+const CACHE_NAME = 'spelu-kaste-v1';
 const ASSETS = [
   './',
   './index.html',
+  './spele15.html',
+  './koka-bloki.html',
   './manifest.json',
-  './icon-192.png',
-  './icon-512.png',
-  './icon-mono-192.png',
-  './icon-mono-512.png',
-  './shortcut-new.png',
-  './shortcut-themes.png'
+  './icon.svg',
+  './icon-maskable.svg',
+  './icon-monochrome.svg'
 ];
 
 self.addEventListener('install', (event) => {
@@ -29,6 +28,8 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request, { ignoreSearch: true }).then((cached) => cached || fetch(event.request))
+    caches.match(event.request, { ignoreSearch: true }).then((cached) => {
+      return cached || fetch(event.request).catch(() => caches.match('./index.html'));
+    })
   );
 });
