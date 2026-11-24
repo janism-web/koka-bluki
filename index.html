@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#FFF3B0" />
+  <meta name="theme-color" content="#FFF3B0" id="meta-theme" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <title>Spēļu kaste</title>
@@ -19,6 +19,29 @@
       --bg-dot: #F4DC7A;
       --ink: #1E1B18;
       --surface: #FFFFFF;
+      --pill-bg: #FFF3B0;
+      --title-shadow: rgba(255, 255, 255, 0.85);
+    }
+
+    body.dark-mode {
+      --bg-base: #1C1E26;
+      --bg-dot: #2A2E3B;
+      --ink: #121318;
+      --surface: #2B2F3C;
+      --pill-bg: #20232E;
+      --title-shadow: rgba(0, 0, 0, 0.45);
+    }
+
+    body.dark-mode .hub-title,
+    body.dark-mode .hub-sub,
+    body.dark-mode .game-card,
+    body.dark-mode .hub-footer,
+    body.dark-mode .theme-toggle-btn {
+      color: #F8FAFC;
+    }
+
+    body.dark-mode .card-best {
+      color: #FFD13B;
     }
 
     * {
@@ -51,7 +74,7 @@
 
     .shape {
       position: absolute;
-      opacity: 0.45;
+      opacity: 0.42;
       animation: floatShape 9s ease-in-out infinite;
     }
 
@@ -61,8 +84,8 @@
       border-radius: 50%;
       background: #FF9F87;
       border: 2.5px solid var(--ink);
-      top: 14%;
-      right: 8%;
+      top: 15%;
+      left: 8%;
     }
 
     .shape.triangle {
@@ -100,39 +123,62 @@
       max-width: 460px;
       height: 100dvh;
       margin: 0 auto;
-      padding: calc(env(safe-area-inset-top, 16px) + 20px) 22px calc(env(safe-area-inset-bottom, 16px) + 24px);
+      padding: calc(env(safe-area-inset-top, 16px) + 18px) 22px calc(env(safe-area-inset-bottom, 16px) + 22px);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
     }
 
-    .hub-header {
-      text-align: center;
-      padding-top: 6px;
+    .hub-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
     }
 
     .hub-title {
-      font-size: 36px;
+      font-size: 34px;
       font-weight: 800;
       letter-spacing: -0.02em;
       color: var(--ink);
-      text-shadow: 3px 3px 0px rgba(255, 255, 255, 0.85);
+      text-shadow: 3px 3px 0px var(--title-shadow);
     }
 
     .hub-sub {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
       opacity: 0.78;
-      margin-top: 4px;
+      margin-top: 2px;
+    }
+
+    .theme-toggle-btn {
+      width: 48px;
+      height: 48px;
+      flex-shrink: 0;
+      background: var(--surface);
+      border: 3px solid var(--ink);
+      border-radius: 16px;
+      box-shadow: 0 4px 0 var(--ink);
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.08s ease, box-shadow 0.08s ease;
+    }
+
+    .theme-toggle-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 var(--ink);
     }
 
     .games-list {
       flex: 1;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-end;
       gap: 18px;
-      padding: 12px 0;
+      padding-bottom: 18px;
     }
 
     .game-card {
@@ -176,6 +222,7 @@
       width: 52px;
       height: 52px;
       background: #FFD13B;
+      color: #1E1B18;
       border: 2.5px solid var(--ink);
       border-radius: 13px;
       display: flex;
@@ -231,20 +278,22 @@
     .card-best {
       display: inline-block;
       margin-top: 8px;
-      background: #FFF3B0;
+      background: var(--pill-bg);
       border: 2px solid var(--ink);
       border-radius: 999px;
       padding: 2px 10px;
       font-size: 12px;
       font-weight: 800;
+      font-variant-numeric: tabular-nums;
     }
 
     .play-arrow {
-      width: 44px;
-      height: 44px;
+      width: 46px;
+      height: 46px;
       flex-shrink: 0;
       border-radius: 50%;
       background: #34D399;
+      color: #1E1B18;
       border: 3px solid var(--ink);
       box-shadow: 0 3px 0 var(--ink);
       display: flex;
@@ -268,9 +317,27 @@
   </div>
 
   <main class="app">
-    <header class="hub-header">
-      <h1 class="hub-title">Spēļu kaste</h1>
-      <p class="hub-sub">Izvēlies spēli brīvam brīdim</p>
+    <header class="hub-top">
+      <div>
+        <h1 class="hub-title">Spēļu kaste</h1>
+        <p class="hub-sub">Izvēlies spēli brīvam brīdim</p>
+      </div>
+      <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Pārslēgt dienas vai nakts režīmu">
+        <svg id="theme-icon-moon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg id="theme-icon-sun" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
     </header>
 
     <section class="games-list">
@@ -281,6 +348,7 @@
         <div class="card-info">
           <div class="card-title">Spēle 15</div>
           <div class="card-desc">Sakārto skaitļus secībā (3×3, 4×4, 5×5)</div>
+          <div class="card-best" id="spele15-best-badge" style="display:none;"></div>
         </div>
         <div class="play-arrow" aria-hidden="true">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -323,14 +391,51 @@
       });
     }
 
-    try {
-      const best = localStorage.getItem('woodblock_best_v1') || localStorage.getItem('koka_bloki_best');
-      if (best && Number(best) > 0) {
-        const badge = document.getElementById('koka-best-badge');
-        badge.textContent = `★ Rekords: ${best}`;
-        badge.style.display = 'inline-block';
-      }
-    } catch (e) {}
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    const moonIcon = document.getElementById('theme-icon-moon');
+    const sunIcon = document.getElementById('theme-icon-sun');
+    const metaTheme = document.getElementById('meta-theme');
+
+    function applyHubTheme(isDark) {
+      document.body.classList.toggle('dark-mode', isDark);
+      moonIcon.style.display = isDark ? 'none' : 'block';
+      sunIcon.style.display = isDark ? 'block' : 'none';
+      metaTheme.setAttribute('content', isDark ? '#1C1E26' : '#FFF3B0');
+    }
+
+    const savedTheme = localStorage.getItem('spelu_kaste_theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyHubTheme(savedTheme === 'dark' || (!savedTheme && prefersDark));
+
+    themeBtn.addEventListener('click', () => {
+      const nextDark = !document.body.classList.contains('dark-mode');
+      localStorage.setItem('spelu_kaste_theme', nextDark ? 'dark' : 'light');
+      applyHubTheme(nextDark);
+    });
+
+    function refreshBadges() {
+      try {
+        const kokaBest = localStorage.getItem('koka_bloki_best');
+        if (kokaBest && Number(kokaBest) > 0) {
+          const badge = document.getElementById('koka-best-badge');
+          badge.textContent = `★ Rekords: ${kokaBest} p.`;
+          badge.style.display = 'inline-block';
+        }
+
+        const s15Raw = localStorage.getItem('spele15_best_4');
+        if (s15Raw) {
+          const s15 = JSON.parse(s15Raw);
+          const m = String(Math.floor(s15.seconds / 60)).padStart(2, '0');
+          const s = String(s15.seconds % 60).padStart(2, '0');
+          const badge15 = document.getElementById('spele15-best-badge');
+          badge15.textContent = `★ 4×4: ${m}:${s} (${s15.moves} gāj.)`;
+          badge15.style.display = 'inline-block';
+        }
+      } catch (e) {}
+    }
+
+    refreshBadges();
+    window.addEventListener('pageshow', refreshBadges);
   </script>
 </body>
 </html>

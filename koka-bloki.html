@@ -567,35 +567,12 @@
     background: var(--accent-primary);
     transition: width 0.3s ease;
   }
-
-  .btn-hub-back {
-    width: 38px;
-    height: 38px;
-    border-radius: 12px;
-    background: var(--surface-elevated);
-    border: 1.5px solid var(--surface-elevated-border);
-    color: var(--text-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    flex-shrink: 0;
-    text-decoration: none;
-    transition: transform 0.1s ease;
-  }
-  .btn-hub-back:active {
-    transform: scale(0.92);
-  }
-
 </style>
 </head>
 <body>
 <div id="app">
   <div class="header">
-    <a href="./index.html" class="btn-hub-back" aria-label="Atpakaļ uz Spēļu kasti" title="Spēļu kaste">
-      <svg class="m-icon" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
-    </a>
-        <div class="stat-capsule score-primary">
+    <div class="stat-capsule score-primary">
       <div class="stat-label">
         <svg class="m-icon m-icon-sm" viewBox="0 0 24 24"><path d="M3 18h18M4 15l2-9 6 5 6-5 2 9H4z"/></svg>
         <span>Punkti</span>
@@ -709,6 +686,13 @@
     <div class="modal-title">Izvēlne</div>
     <div class="modal-sub">Spēles iestatījumi un opcijas</div>
     <div class="settings-list">
+      <button class="settings-btn-row" id="menu-hub-btn">
+        <span class="settings-row-left">
+          <svg class="m-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          <span>Spēļu kaste</span>
+        </span>
+        <span class="settings-pill-val">Izvēlne</span>
+      </button>
       <button class="settings-btn-row" id="menu-themes-btn">
         <span class="settings-row-left">
           <svg class="m-icon" viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
@@ -1177,7 +1161,7 @@
     canvas.height = Math.floor(height * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    const maxBoardW = width - 16;
+    const maxBoardW = width - 36;
     const minTopMargin = 10;
     const minBottomMargin = 10;
     const minGap = 16;
@@ -1891,7 +1875,51 @@
       if (ft.life <= 0) floatingTexts.splice(i, 1);
     }
 
-    requestAnimationFrame(draw);
+    
+  document.getElementById("menu-hub-btn").addEventListener("click", () => {
+    saveGameState();
+    window.location.href = "./index.html";
+  });
+
+  // Backdrop click to dismiss Settings & Themes modals
+  document.getElementById("settings-modal").addEventListener("click", (e) => {
+    if (e.target.id === "settings-modal") {
+      disarmResetConfirm();
+      document.getElementById("settings-modal").classList.remove("show");
+    }
+  });
+  document.getElementById("themes-modal").addEventListener("click", (e) => {
+    if (e.target.id === "themes-modal") {
+      document.getElementById("themes-modal").classList.remove("show");
+    }
+  });
+
+  // Push dummy state so first Android Back swipe closes modals/hammer before leaving game
+  function pushModalHistory() {
+    try { history.pushState({ modalOpen: true }, ""); } catch (e) {}
+  }
+  const origSettingsClick = document.getElementById("settings-btn");
+  origSettingsClick.addEventListener("click", pushModalHistory);
+
+  window.addEventListener("popstate", () => {
+    const settingsM = document.getElementById("settings-modal");
+    const themesM = document.getElementById("themes-modal");
+    if (themesM.classList.contains("show")) {
+      themesM.classList.remove("show");
+      return;
+    }
+    if (settingsM.classList.contains("show")) {
+      disarmResetConfirm();
+      settingsM.classList.remove("show");
+      return;
+    }
+    if (hammerArmed) {
+      hammerArmed = false;
+      updateUI();
+    }
+  });
+
+  requestAnimationFrame(draw);
   }
 
   function getCanvasCoords(e) {
@@ -1967,7 +1995,7 @@
           startX: pos.x,
           startY: pos.y,
           currentX: pos.x,
-          currentY: pos.y - FINGER_OFFSET_Y,
+          currentY: pos.y - Math.max(68, Math.round(cellSize * 1.65)),
           startTime: performance.now(),
           isDragging: false,
           lastSnapKey: null
@@ -1992,7 +2020,7 @@
 
     if (dragState.isDragging) {
       dragState.currentX = pos.x;
-      dragState.currentY = pos.y - FINGER_OFFSET_Y;
+      dragState.currentY = pos.y - Math.max(68, Math.round(cellSize * 1.65));
 
       const dropPos = getDropGridPos();
       const snapKey = dropPos ? `${dropPos.row},${dropPos.col}` : null;

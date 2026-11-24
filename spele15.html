@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#FFF3B0" />
+  <meta name="theme-color" content="#FFF3B0" id="meta-theme" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <title>Spēle 15 — Spēļu kaste</title>
@@ -18,6 +18,7 @@
       --bg-dot: #F4DC7A;
       --ink: #1E1B18;
       --surface: #FFFFFF;
+      --surface-soft: #FFF8D6;
       --board-bg: #5BC0EB;
       --board-well: #3A9BC7;
       --tile-default: #70C1FF;
@@ -29,6 +30,30 @@
       --btn-primary: #34D399;
       --btn-active: #FFD13B;
       --border-w: 3px;
+      --title-shadow: rgba(255, 255, 255, 0.8);
+    }
+
+    body.dark-mode {
+      --bg-base: #1C1E26;
+      --bg-dot: #2A2E3B;
+      --ink: #121318;
+      --surface: #2B2F3C;
+      --surface-soft: #232631;
+      --board-bg: #367FA6;
+      --board-well: #235875;
+      --title-shadow: rgba(0, 0, 0, 0.45);
+    }
+
+    body.dark-mode .title,
+    body.dark-mode .stat-pill,
+    body.dark-mode .pause-btn,
+    body.dark-mode .size-btn,
+    body.dark-mode .win-sheet {
+      color: #F8FAFC;
+    }
+
+    body.dark-mode .size-btn.active {
+      color: #1E1B18;
     }
 
     * {
@@ -62,7 +87,7 @@
 
     .shape {
       position: absolute;
-      opacity: 0.45;
+      opacity: 0.42;
       animation: floatShape 9s ease-in-out infinite;
     }
 
@@ -120,29 +145,8 @@
     .top-bar {
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: space-between;
       padding: 2px 0;
-    }
-
-    .hub-back-btn {
-      width: 44px;
-      height: 44px;
-      flex-shrink: 0;
-      background: var(--surface);
-      border: var(--border-w) solid var(--ink);
-      border-radius: 15px;
-      box-shadow: 0 4px 0 var(--ink);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--ink);
-      text-decoration: none;
-      transition: transform 0.08s ease, box-shadow 0.08s ease;
-    }
-
-    .hub-back-btn:active {
-      transform: translateY(3px);
-      box-shadow: 0 1px 0 var(--ink);
     }
 
     .title {
@@ -150,7 +154,25 @@
       font-weight: 800;
       letter-spacing: -0.02em;
       color: var(--ink);
-      text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.8);
+      text-shadow: 2px 2px 0px var(--title-shadow);
+    }
+
+    .best-chip {
+      background: var(--surface);
+      border: 2.5px solid var(--ink);
+      border-radius: 999px;
+      box-shadow: 0 3px 0 var(--ink);
+      padding: 5px 12px;
+      font-size: 13px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    body.dark-mode .best-chip {
+      color: #FFD13B;
     }
 
     .stats-row {
@@ -162,7 +184,7 @@
 
     .stat-pill {
       flex: 1;
-      height: 44px;
+      height: 46px;
       background: var(--surface);
       border: var(--border-w) solid var(--ink);
       border-radius: 999px;
@@ -170,9 +192,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      font-size: 15px;
-      font-weight: 700;
+      gap: 7px;
+      font-size: 17px;
+      font-weight: 800;
       font-variant-numeric: tabular-nums;
       white-space: nowrap;
       padding: 0 12px;
@@ -180,7 +202,7 @@
 
     .pause-btn {
       width: 48px;
-      height: 44px;
+      height: 46px;
       flex-shrink: 0;
       background: var(--surface);
       border: var(--border-w) solid var(--ink);
@@ -348,12 +370,14 @@
       position: absolute;
       inset: 0;
       background: #FFD13B;
+      color: #1E1B18;
       z-index: 30;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 14px;
+      gap: 12px;
+      padding: 20px;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.18s ease;
@@ -365,8 +389,25 @@
     }
 
     .pause-veil-title {
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .hub-link-btn {
+      background: #FFFFFF;
+      color: #1E1B18;
+      border: 3px solid #1E1B18;
+      border-radius: 999px;
+      box-shadow: 0 4px 0 #1E1B18;
+      padding: 10px 22px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 800;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .bottom-controls {
@@ -382,7 +423,7 @@
     }
 
     .size-btn {
-      height: 46px;
+      height: 48px;
       background: var(--surface);
       border: var(--border-w) solid var(--ink);
       border-radius: 999px;
@@ -418,7 +459,7 @@
       font-family: inherit;
       font-size: 19px;
       font-weight: 800;
-      color: var(--ink);
+      color: #1E1B18;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -437,7 +478,7 @@
       left: 50%;
       bottom: calc(env(safe-area-inset-bottom, 12px) + 132px);
       transform: translate(-50%, 20px);
-      background: var(--ink);
+      background: #1E1B18;
       color: #FFFFFF;
       padding: 10px 14px 10px 18px;
       border-radius: 999px;
@@ -461,7 +502,7 @@
 
     .undo-btn {
       background: #FFD13B;
-      color: var(--ink);
+      color: #1E1B18;
       border: none;
       border-radius: 999px;
       padding: 6px 14px;
@@ -474,7 +515,7 @@
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(30, 27, 24, 0.55);
+      background: rgba(18, 19, 24, 0.6);
       z-index: 50;
       display: flex;
       align-items: flex-end;
@@ -510,6 +551,7 @@
     .win-badge {
       display: inline-block;
       background: #FFD13B;
+      color: #1E1B18;
       border: 3px solid var(--ink);
       border-radius: 999px;
       padding: 6px 18px;
@@ -532,7 +574,7 @@
     }
 
     .win-stat-box {
-      background: #FFF8D6;
+      background: var(--surface-soft);
       border: 3px solid var(--ink);
       border-radius: 20px;
       padding: 12px;
@@ -570,27 +612,26 @@
   <main class="app">
     <header>
       <div class="top-bar">
-        <a href="./index.html" class="hub-back-btn" aria-label="Atpakaļ uz Spēļu kasti" title="Spēļu kaste">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M15 18l-6-6 6-6"/>
-          </svg>
-        </a>
         <h1 class="title">Spēle 15</h1>
+        <div class="best-chip" id="best-chip" style="display:none;">
+          <span>★</span>
+          <span id="best-chip-val">—</span>
+        </div>
       </div>
 
       <div class="stats-row">
         <div class="stat-pill" aria-label="Gājienu skaits">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
             <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/>
             <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/>
             <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/>
             <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>
           </svg>
-          <span>Gājieni: <strong id="moves-val">0</strong></span>
+          <span id="moves-val">0</span>
         </div>
 
         <div class="stat-pill" aria-label="Spēles laiks">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="13" r="8"/>
             <path d="M12 9v4l2 2"/>
             <path d="M9 2h6"/>
@@ -599,7 +640,7 @@
         </div>
 
         <button class="pause-btn" id="pause-btn" type="button" aria-label="Pauze">
-          <svg id="pause-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
             <rect x="6" y="4" width="4" height="16" rx="1.5"/>
             <rect x="14" y="4" width="4" height="16" rx="1.5"/>
           </svg>
@@ -618,6 +659,7 @@
             <button class="shuffle-btn" id="resume-btn" type="button" style="width: auto; padding: 0 28px;">
               Turpināt spēli
             </button>
+            <a href="./index.html" class="hub-link-btn">Spēļu kaste</a>
           </div>
         </div>
       </div>
@@ -651,7 +693,7 @@
 
   <div class="modal-backdrop" id="win-modal">
     <div class="win-sheet">
-      <div class="win-badge">★ Lieliski paveikts!</div>
+      <div class="win-badge" id="win-badge">★ Lieliski paveikts!</div>
       <h2 class="win-title">Uzvara!</h2>
       <div class="win-stats">
         <div class="win-stat-box">
@@ -675,6 +717,14 @@
     }
 
     (() => {
+      // Sync dark mode preference with hub
+      const savedTheme = localStorage.getItem('spelu_kaste_theme');
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.body.classList.add('dark-mode');
+        document.getElementById('meta-theme').setAttribute('content', '#1C1E26');
+      }
+
       const GAP = 8;
       let size = 4;
       let board = [];
@@ -691,6 +741,8 @@
 
       const movesEl = document.getElementById('moves-val');
       const timerEl = document.getElementById('timer-val');
+      const bestChip = document.getElementById('best-chip');
+      const bestChipVal = document.getElementById('best-chip-val');
       const gridSlotsEl = document.getElementById('grid-slots');
       const tilesLayerEl = document.getElementById('tiles-layer');
       const pauseBtn = document.getElementById('pause-btn');
@@ -701,6 +753,7 @@
       const snackbarEl = document.getElementById('snackbar');
       const undoBtn = document.getElementById('undo-btn');
       const winModal = document.getElementById('win-modal');
+      const winBadge = document.getElementById('win-badge');
       const winMovesEl = document.getElementById('win-moves');
       const winTimeEl = document.getElementById('win-time');
       const playAgainBtn = document.getElementById('play-again-btn');
@@ -709,6 +762,38 @@
         const m = String(Math.floor(sec / 60)).padStart(2, '0');
         const s = String(sec % 60).padStart(2, '0');
         return `${m}:${s}`;
+      }
+
+      function getBestRecord(n) {
+        try {
+          const raw = localStorage.getItem(`spele15_best_${n}`);
+          return raw ? JSON.parse(raw) : null;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function saveBestRecord(n, m, s) {
+        const prev = getBestRecord(n);
+        let isNew = false;
+        if (!prev || s < prev.seconds || (s === prev.seconds && m < prev.moves)) {
+          isNew = true;
+          try {
+            localStorage.setItem(`spele15_best_${n}`, JSON.stringify({ moves: m, seconds: s }));
+          } catch (e) {}
+        }
+        updateBestChip();
+        return isNew;
+      }
+
+      function updateBestChip() {
+        const best = getBestRecord(size);
+        if (best) {
+          bestChip.style.display = 'inline-flex';
+          bestChipVal.textContent = `${formatTime(best.seconds)} · ${best.moves}`;
+        } else {
+          bestChip.style.display = 'none';
+        }
       }
 
       function updateStatsUI() {
@@ -737,6 +822,9 @@
         if (isWon) return;
         isPaused = paused;
         pauseVeil.classList.toggle('active', isPaused);
+        if (isPaused) {
+          try { history.pushState({ overlay: 'pause' }, ''); } catch (e) {}
+        }
       }
 
       function isSolvable(arr, n) {
@@ -966,6 +1054,7 @@
       function handleWin() {
         isWon = true;
         stopTimer();
+        const isNewBest = saveBestRecord(size, moves, seconds);
 
         for (let val = 1; val < size * size; val++) {
           const el = tileElements.get(val);
@@ -977,9 +1066,11 @@
         launchConfetti();
 
         setTimeout(() => {
+          winBadge.textContent = isNewBest ? `★ Jauns ${size}×${size} rekords!` : '★ Lieliski paveikts!';
           winMovesEl.textContent = moves;
           winTimeEl.textContent = formatTime(seconds);
           winModal.classList.add('open');
+          try { history.pushState({ overlay: 'win' }, ''); } catch (e) {}
         }, 750);
       }
 
@@ -1021,6 +1112,7 @@
           btn.textContent = active ? `★ ${bSize}×${bSize}` : `${bSize}×${bSize}`;
         });
 
+        updateBestChip();
         updateStatsUI();
         buildBoardDOM();
       }
@@ -1044,6 +1136,7 @@
           btn.textContent = active ? `★ ${bSize}×${bSize}` : `${bSize}×${bSize}`;
         });
 
+        updateBestChip();
         updateStatsUI();
         buildBoardDOM();
         if (moves > 0) startTimer();
@@ -1053,6 +1146,22 @@
       resumeBtn.addEventListener('click', () => setPaused(false));
       shuffleBtn.addEventListener('click', () => startNewGame(size, true));
       playAgainBtn.addEventListener('click', () => startNewGame(size, false));
+
+      winModal.addEventListener('click', (e) => {
+        if (e.target === winModal) {
+          winModal.classList.remove('open');
+        }
+      });
+
+      window.addEventListener('popstate', () => {
+        if (winModal.classList.contains('open')) {
+          winModal.classList.remove('open');
+          return;
+        }
+        if (isPaused) {
+          setPaused(false);
+        }
+      });
 
       sizeBtns.forEach((btn) => {
         btn.addEventListener('click', () => {

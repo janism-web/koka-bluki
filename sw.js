@@ -1,4 +1,4 @@
-const CACHE_NAME = 'spelu-kaste-v1';
+const CACHE_NAME = 'spelu-kaste-v2';
 const ASSETS = [
   './',
   './index.html',
