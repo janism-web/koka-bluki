@@ -1,4 +1,4 @@
-const CACHE_NAME = 'spelu-kaste-v2';
+const CACHE_NAME = 'spelu-kaste-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -27,9 +27,43 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return;
+
+  const url = new URL(event.request.url);
+
+  // Cache Google Fonts dynamically for full offline support
+  if (url.origin === 'https://fonts.googleapis.com' || url.origin === 'https://fonts.gstatic.com') {
+    event.respondWith(
+      caches.open(CACHE_NAME).then((cache) =>
+        cache.match(event.request).then((cached) => {
+          const fetched = fetch(event.request).then((resp) => {
+            if (resp && resp.status === 200) {
+              cache.put(event.request, resp.clone());
+            }
+            return resp;
+          }).catch(() => cached);
+          return cached || fetched;
+        })
+      )
+    );
+    return;
+  }
+
+  // Stale-While-Revalidate for local app files so GitHub Pages updates propagate seamlessly
   event.respondWith(
-    caches.match(event.request, { ignoreSearch: true }).then((cached) => {
-      return cached || fetch(event.request).catch(() => caches.match('./index.html'));
-    })
+    caches.open(CACHE_NAME).then((cache) =>
+      cache.match(event.request, { ignoreSearch: true }).then((cached) => {
+        const networkFetch = fetch(event.request)
+          .then((response) => {
+            if (response && response.status === 200) {
+              cache.put(event.request, response.clone());
+            }
+            return response;
+          })
+          .catch(() => cached || caches.match('./index.html'));
+
+        return cached || networkFetch;
+      })
+    )
   );
 });

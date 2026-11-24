@@ -8,8 +8,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Koka Bloki</title>
 <link rel="manifest" href="./manifest.json">
-<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
-<link rel="apple-touch-icon" href="./icon-512.png">
+<link rel="icon" type="image/svg+xml" href="./icon.svg">
+<link rel="apple-touch-icon" href="./icon-maskable.svg">
 <style>
   :root {
     --bg-radial: radial-gradient(circle at 50% 25%, #c9884c 0%, #874f26 65%, #562f12 100%);
@@ -893,6 +893,7 @@
     document.getElementById("meta-theme-color").setAttribute("content", t.themeColor);
     document.getElementById("menu-theme-name").textContent = t.shortName;
     updateDynamicFavicon(t);
+    if (typeof invalidateBgCache === "function") invalidateBgCache();
   }
 
   const BASE_SHAPES = [
@@ -1077,10 +1078,68 @@
   let particles = [];
   let floatingTexts = [];
   let flashCells = [];
-  let dragState = null;
+  let dragState = null; scheduleDraw();
 
   const canvas = document.getElementById("gameCanvas");
   const ctx = canvas.getContext("2d");
+  const bgCanvas = document.createElement("canvas");
+  const bgCtx = bgCanvas.getContext("2d");
+  let bgCacheValid = false;
+  let rafPending = false;
+
+  function invalidateBgCache() {
+    bgCacheValid = false;
+    scheduleDraw();
+  }
+
+  function scheduleDraw() {
+    if (!rafPending) {
+      rafPending = true;
+      document.getElementById("menu-hub-btn").addEventListener("click", () => {
+    saveGameState();
+    window.location.href = "./index.html";
+  });
+
+  document.getElementById("settings-modal").addEventListener("click", (e) => {
+    if (e.target.id === "settings-modal") {
+      disarmResetConfirm();
+      document.getElementById("settings-modal").classList.remove("show");
+    }
+  });
+
+  document.getElementById("themes-modal").addEventListener("click", (e) => {
+    if (e.target.id === "themes-modal") {
+      document.getElementById("themes-modal").classList.remove("show");
+    }
+  });
+
+  document.getElementById("settings-btn").addEventListener("click", () => {
+    try { history.pushState({ modalOpen: true }, ""); } catch (e) {}
+  });
+
+  window.addEventListener("popstate", () => {
+    const settingsM = document.getElementById("settings-modal");
+    const themesM = document.getElementById("themes-modal");
+    if (themesM.classList.contains("show")) {
+      themesM.classList.remove("show");
+      return;
+    }
+    if (settingsM.classList.contains("show")) {
+      disarmResetConfirm();
+      settingsM.classList.remove("show");
+      return;
+    }
+    if (hammerArmed) {
+      hammerArmed = false;
+      updateUI();
+      scheduleDraw();
+    }
+  });
+
+  scheduleDraw();
+    }
+  }
+
   let dpr = Math.min(window.devicePixelRatio || 1, 2);
   let width = 0;
   let height = 0;
@@ -1181,6 +1240,11 @@
     boardX = Math.floor((width - boardSize) / 2);
     boardY = topMargin + extraOffset;
     trayY = boardY + boardSize + gapBetween;
+    bgCanvas.width = canvas.width;
+    bgCanvas.height = canvas.height;
+    bgCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    bgCacheValid = false;
+    scheduleDraw();
   }
 
   window.addEventListener("resize", resize);
@@ -1450,7 +1514,7 @@
     }
 
     refillTrayIfEmpty();
-    updateUI();
+    updateUI(); scheduleDraw();
     saveGameState();
     checkGameOver();
   }
@@ -1656,7 +1720,60 @@
     ctx.restore();
   }
 
+  function renderStaticBackground(t) {
+    bgCtx.clearRect(0, 0, width, height);
+    const framePad = 8;
+    bgCtx.save();
+    bgCtx.fillStyle = t.boardFrame;
+    bgCtx.strokeStyle = t.boardBorder;
+    bgCtx.lineWidth = 2.5;
+    roundRect(bgCtx, boardX - framePad, boardY - framePad, boardSize + framePad * 2, boardSize + framePad * 2, 18);
+    bgCtx.fill();
+    bgCtx.stroke();
+    bgCtx.restore();
+
+    for (let r = 0; r < GRID_SIZE; r++) {
+      for (let c = 0; c < GRID_SIZE; c++) {
+        const cx = boardX + c * cellSize;
+        const cy = boardY + r * cellSize;
+        const pad = 2;
+        bgCtx.fillStyle = (r + c) % 2 === 0 ? t.cellEven : t.cellOdd;
+        roundRect(bgCtx, cx + pad, cy + pad, cellSize - pad * 2, cellSize - pad * 2, 5);
+        bgCtx.fill();
+        bgCtx.strokeStyle = "rgba(255, 255, 255, 0.06)";
+        bgCtx.lineWidth = 1;
+        bgCtx.stroke();
+      }
+    }
+
+    const dockX = boardX - framePad;
+    const dockW = boardSize + framePad * 2;
+    bgCtx.save();
+    bgCtx.fillStyle = t.dockFrame;
+    bgCtx.strokeStyle = t.surfaceRecessedBorder;
+    bgCtx.lineWidth = 1.5;
+    roundRect(bgCtx, dockX, trayY, dockW, trayHeight, 18);
+    bgCtx.fill();
+    bgCtx.stroke();
+    bgCtx.restore();
+
+    const slotGap = 8;
+    const slotInnerW = (dockW - slotGap * 4) / 3;
+    const slotInnerH = trayHeight - slotGap * 2;
+    for (let i = 0; i < 3; i++) {
+      const sx = dockX + slotGap + i * (slotInnerW + slotGap);
+      const sy = trayY + slotGap;
+      bgCtx.save();
+      bgCtx.fillStyle = t.dockSlot;
+      roundRect(bgCtx, sx, sy, slotInnerW, slotInnerH, 13);
+      bgCtx.fill();
+      bgCtx.restore();
+    }
+    bgCacheValid = true;
+  }
+
   function draw() {
+    rafPending = false;
     const t = getActiveTheme();
 
     if (displayedScore !== score) {
@@ -1679,31 +1796,26 @@
       boardShakeTimer = Math.max(0, boardShakeTimer - 0.06);
     }
 
+    if (!bgCacheValid) renderStaticBackground(t);
     const bxBase = boardX + shakeOffsetX;
     const framePad = 8;
-    ctx.save();
-    ctx.fillStyle = t.boardFrame;
-    ctx.strokeStyle = hammerArmed ? t.accentPrimary : t.boardBorder;
-    ctx.lineWidth = hammerArmed ? 3 : 2.5;
-    roundRect(ctx, bxBase - framePad, boardY - framePad, boardSize + framePad * 2, boardSize + framePad * 2, 18);
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
+
+    ctx.drawImage(bgCanvas, shakeOffsetX * dpr, 0, width * dpr, height * dpr, 0, 0, width, height);
+
+    if (hammerArmed) {
+      ctx.save();
+      ctx.strokeStyle = t.accentPrimary;
+      ctx.lineWidth = 3;
+      roundRect(ctx, bxBase - framePad, boardY - framePad, boardSize + framePad * 2, boardSize + framePad * 2, 18);
+      ctx.stroke();
+      ctx.restore();
+    }
 
     for (let r = 0; r < GRID_SIZE; r++) {
       for (let c = 0; c < GRID_SIZE; c++) {
-        const cx = bxBase + c * cellSize;
-        const cy = boardY + r * cellSize;
-        const pad = 2;
-        ctx.fillStyle = (r + c) % 2 === 0 ? t.cellEven : t.cellOdd;
-        roundRect(ctx, cx + pad, cy + pad, cellSize - pad * 2, cellSize - pad * 2, 5);
-        ctx.fill();
-
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.06)";
-        ctx.lineWidth = 1;
-        ctx.stroke();
-
         if (grid[r][c] === 1) {
+          const cx = bxBase + c * cellSize;
+          const cy = boardY + r * cellSize;
           const highlightCell = previewLines.rows.has(r) || previewLines.cols.has(c);
           drawWoodBlock(cx, cy, cellSize, 1, false, hammerArmed, highlightCell);
         }
@@ -1750,30 +1862,11 @@
       if (fc.life <= 0) flashCells.splice(i, 1);
     }
 
-    const dockX = boardX - framePad;
     const dockW = boardSize + framePad * 2;
-    ctx.save();
-    ctx.fillStyle = t.dockFrame;
-    ctx.strokeStyle = t.surfaceRecessedBorder;
-    ctx.lineWidth = 1.5;
-    roundRect(ctx, dockX, trayY, dockW, trayHeight, 18);
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
-
+    const dockX = boardX - framePad;
     const slotGap = 8;
     const slotInnerW = (dockW - slotGap * 4) / 3;
     const slotInnerH = trayHeight - slotGap * 2;
-
-    for (let i = 0; i < 3; i++) {
-      const sx = dockX + slotGap + i * (slotInnerW + slotGap);
-      const sy = trayY + slotGap;
-      ctx.save();
-      ctx.fillStyle = t.dockSlot;
-      roundRect(ctx, sx, sy, slotInnerW, slotInnerH, 13);
-      ctx.fill();
-      ctx.restore();
-    }
 
     for (let i = 0; i < 3; i++) {
       const piece = tray[i];
@@ -1875,51 +1968,19 @@
       if (ft.life <= 0) floatingTexts.splice(i, 1);
     }
 
-    
-  document.getElementById("menu-hub-btn").addEventListener("click", () => {
-    saveGameState();
-    window.location.href = "./index.html";
-  });
-
-  // Backdrop click to dismiss Settings & Themes modals
-  document.getElementById("settings-modal").addEventListener("click", (e) => {
-    if (e.target.id === "settings-modal") {
-      disarmResetConfirm();
-      document.getElementById("settings-modal").classList.remove("show");
+    const hasTrayAnim = tray.some(p => p && p.animScale < 1);
+    if (
+      displayedScore !== score ||
+      dragState !== null ||
+      particles.length > 0 ||
+      floatingTexts.length > 0 ||
+      flashCells.length > 0 ||
+      boardShakeTimer > 0 ||
+      hasLineHighlight ||
+      hasTrayAnim
+    ) {
+      scheduleDraw();
     }
-  });
-  document.getElementById("themes-modal").addEventListener("click", (e) => {
-    if (e.target.id === "themes-modal") {
-      document.getElementById("themes-modal").classList.remove("show");
-    }
-  });
-
-  // Push dummy state so first Android Back swipe closes modals/hammer before leaving game
-  function pushModalHistory() {
-    try { history.pushState({ modalOpen: true }, ""); } catch (e) {}
-  }
-  const origSettingsClick = document.getElementById("settings-btn");
-  origSettingsClick.addEventListener("click", pushModalHistory);
-
-  window.addEventListener("popstate", () => {
-    const settingsM = document.getElementById("settings-modal");
-    const themesM = document.getElementById("themes-modal");
-    if (themesM.classList.contains("show")) {
-      themesM.classList.remove("show");
-      return;
-    }
-    if (settingsM.classList.contains("show")) {
-      disarmResetConfirm();
-      settingsM.classList.remove("show");
-      return;
-    }
-    if (hammerArmed) {
-      hammerArmed = false;
-      updateUI();
-    }
-  });
-
-  requestAnimationFrame(draw);
   }
 
   function getCanvasCoords(e) {
@@ -1961,7 +2022,7 @@
             addFloatingText(boardX + boardSize / 2, boardY + boardSize / 2, "TĪRS LAUKUMS! +300");
           }
 
-          updateUI();
+          updateUI(); scheduleDraw();
           saveGameState();
           checkGameOver();
           return true;
@@ -2025,7 +2086,7 @@
       const dropPos = getDropGridPos();
       const snapKey = dropPos ? `${dropPos.row},${dropPos.col}` : null;
       if (snapKey !== dragState.lastSnapKey) {
-        dragState.lastSnapKey = snapKey;
+        dragState.lastSnapKey = snapKey; scheduleDraw();
         if (snapKey !== null) {
           vibrate(6);
         }
@@ -2043,7 +2104,7 @@
     if (!dragState.isDragging && elapsed < TAP_THRESHOLD_MS + 150 && piece) {
       if (piece.rotatable) {
         piece.shape = rotateMatrix(piece.shape);
-        piece.animScale = 0.78;
+        piece.animScale = 0.78; scheduleDraw();
         playWoodSound("rotate");
         vibrate(12);
         saveGameState();
@@ -2057,7 +2118,7 @@
       }
     }
 
-    dragState = null;
+    dragState = null; scheduleDraw();
   }
 
   canvas.addEventListener("touchstart", onPointerDown, { passive: false });
@@ -2095,7 +2156,7 @@
     playWoodSound("undo");
     vibrate([15, 25, 15]);
     addFloatingText(boardX + boardSize / 2, boardY + boardSize * 0.5, "Gājiens atsaukts");
-    updateUI();
+    updateUI(); scheduleDraw();
     saveGameState();
   });
 
@@ -2113,13 +2174,13 @@
     }
     hammerArmed = !hammerArmed;
     playWoodSound("pickup");
-    updateUI();
+    updateUI(); scheduleDraw();
   });
 
   document.getElementById("cancel-hammer-btn").addEventListener("click", () => {
     hammerArmed = false;
     playWoodSound("rotate");
-    updateUI();
+    updateUI(); scheduleDraw();
   });
 
   document.getElementById("reroll-btn").addEventListener("click", () => {
@@ -2136,7 +2197,7 @@
     tray.forEach(p => { if (p) p.animScale = 0.65; });
     playWoodSound("rotate");
     vibrate([15, 20, 15]);
-    updateUI();
+    updateUI(); scheduleDraw();
     saveGameState();
     checkGameOver();
   });
@@ -2159,7 +2220,7 @@
   document.getElementById("settings-btn").addEventListener("click", () => {
     ensureAudio();
     hammerArmed = false;
-    updateUI();
+    updateUI(); scheduleDraw();
     disarmResetConfirm();
     document.getElementById("menu-sound-state").textContent = soundEnabled ? "Ieslēgta" : "Izslēgta";
     document.getElementById("settings-modal").classList.add("show");
@@ -2249,7 +2310,7 @@
 
   function openThemesModal() {
     hammerArmed = false;
-    updateUI();
+    updateUI(); scheduleDraw();
     renderThemesList();
     document.getElementById("settings-modal").classList.remove("show");
     document.getElementById("themes-modal").classList.add("show");
@@ -2319,10 +2380,10 @@
     particles = [];
     floatingTexts = [];
     flashCells = [];
-    dragState = null;
+    dragState = null; scheduleDraw();
     document.getElementById("gameover-modal").classList.remove("show");
     document.getElementById("gameover-modal").classList.remove("peeking");
-    updateUI();
+    updateUI(); scheduleDraw();
     saveGameState();
   }
 
@@ -2351,7 +2412,7 @@
   } else {
     if (loadGameState()) {
       document.getElementById("score-val").textContent = displayedScore;
-      updateUI();
+      updateUI(); scheduleDraw();
       checkGameOver();
     } else {
       startNewGame();
