@@ -1,47 +1,23 @@
 {
-  "id": "./?app=spelu-kaste-v6",
+  "id": "./",
   "name": "Spēļu kaste",
   "short_name": "Spēļu kaste",
   "description": "Spēle 15 un Koka Bloki vienā bezsaistes spēļu kolekcijā",
-  "start_url": "./index.html?v=6",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#FFF3B0",
   "theme_color": "#FFF3B0",
   "lang": "lv",
+  "dir": "ltr",
   "categories": ["games", "puzzle"],
   "icons": [
-    {
-      "src": "./icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "./icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "./icon-maskable-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "./icon-mono-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "monochrome"
-    },
-    {
-      "src": "./icon-mono-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "monochrome"
-    }
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "./icon-mono-192.png", "sizes": "192x192", "type": "image/png", "purpose": "monochrome" },
+    { "src": "./icon-mono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "monochrome" }
   ],
   "shortcuts": [
     {
@@ -49,26 +25,21 @@
       "short_name": "Spēle 15",
       "description": "Atvērt Spēli 15",
       "url": "./spele15.html",
-      "icons": [
-        {
-          "src": "./icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
+      "icons": [{ "src": "./icon-192.png", "sizes": "192x192", "type": "image/png" }]
     },
     {
       "name": "Koka Bloki",
       "short_name": "Koka Bloki",
-      "description": "Atvērt Koka Blokus",
+      "description": "Turpināt Koka Blokus",
       "url": "./koka-bloki.html",
-      "icons": [
-        {
-          "src": "./icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
+      "icons": [{ "src": "./icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Koka Bloki: tēmas",
+      "short_name": "Tēmas",
+      "description": "Atvērt Koka Bloku materiālu tēmas",
+      "url": "./koka-bloki.html?action=themes",
+      "icons": [{ "src": "./icon-192.png", "sizes": "192x192", "type": "image/png" }]
     }
   ]
 }

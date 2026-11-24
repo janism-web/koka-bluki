@@ -1,0 +1,101 @@
+/* Kopīgais stils: Spēļu kaste (hub) un Spēle 15 */
+
+@font-face {
+  font-family: 'Fredoka';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('./fonts/fredoka-latin-ext-wght-normal.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Fredoka';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('./fonts/fredoka-latin-wght-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  --bg-base: #FFF3B0;
+  --bg-dot: #F4DC7A;
+  --ink: #1E1B18;
+  --text: #1E1B18;
+  --surface: #FFFFFF;
+  --title-shadow: rgba(255, 255, 255, 0.85);
+}
+
+:root.dark-mode {
+  --bg-base: #1C1E26;
+  --bg-dot: #2A2E3B;
+  --ink: #121318;
+  --text: #F8FAFC;
+  --surface: #2B2F3C;
+  --title-shadow: rgba(0, 0, 0, 0.45);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  background-color: var(--bg-base);
+}
+
+html, body {
+  width: 100%;
+  height: 100vh;   /* rezerves variants vecākiem pārlūkiem */
+  height: 100dvh;
+  overflow: hidden;
+  background-color: var(--bg-base);
+  background-image: radial-gradient(var(--bg-dot) 2.5px, transparent 2.5px);
+  background-size: 24px 24px;
+  color: var(--text);
+  font-family: 'Fredoka', system-ui, -apple-system, sans-serif;
+}
+
+.bg-deco {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.shape {
+  position: absolute;
+  opacity: 0.42;
+  animation: floatShape 9s ease-in-out infinite;
+}
+
+@keyframes floatShape {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(12deg); }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+:focus-visible {
+  outline: 3px solid #5B21B6;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

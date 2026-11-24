@@ -1,11 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect x="136" y="136" width="110" height="110" rx="24" fill="none" stroke="#000000" stroke-width="18"/>
-  <path d="M162 178 L175 167 L175 215 M163 215 L187 215" fill="none" stroke="#000000" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M224 167 L202 167 L200 187 C206 184 224 184 224 200 C224 213 209 217 198 210" fill="none" stroke="#000000" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
-  <rect x="266" y="136" width="110" height="110" rx="24" fill="#000000"/>
-  <path d="M321 163 l8 16 l18 3 l-13 12 l3 18 l-16 -8 l-16 8 l3 -18 l-13 -12 l18 -3 z" fill="#FFFFFF"/>
-  <rect x="136" y="266" width="110" height="110" rx="24" fill="#000000"/>
-  <rect x="164" y="294" width="54" height="54" rx="12" fill="#FFFFFF"/>
-  <rect x="266" y="266" width="110" height="110" rx="24" fill="none" stroke="#000000" stroke-width="18"/>
-  <rect x="296" y="296" width="50" height="50" rx="10" fill="#000000"/>
+  <!-- Monohroma (tematiskā) ikona: melns = redzams, balts = caurums. Viss saturs 66% drošajā zonā. -->
+  <rect width="512" height="512" fill="#fff"/>
+  <!-- 15 flīze: kontūra -->
+  <rect x="128" y="128" width="118" height="118" rx="28" fill="#000"/>
+  <rect x="146" y="146" width="82" height="82" rx="14" fill="#fff"/>
+  <g transform="translate(-6,-4)" fill="none" stroke="#000" stroke-width="13" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M162 178 L175 167 L175 215 M163 215 L187 215"/>
+    <path d="M224 167 L202 167 L200 187 C206 184 224 184 224 200 C224 213 209 217 198 210"/>
+  </g>
+  <!-- zvaigzne: pilns bloks ar zvaigznes izgriezumu -->
+  <rect x="266" y="128" width="118" height="118" rx="28" fill="#000"/>
+  <path d="M325 152 l9 19 l21 3 l-15 15 l4 21 l-19 -10 l-19 10 l4 -21 l-15 -15 l21 -3 z" fill="#fff"/>
+  <!-- koka bloks: pilns ar izgriezumu -->
+  <rect x="128" y="266" width="118" height="118" rx="28" fill="#000"/>
+  <rect x="160" y="298" width="54" height="54" rx="12" fill="#fff"/>
+  <!-- koka bloks: kontūra ar pilnu kodolu -->
+  <rect x="266" y="266" width="118" height="118" rx="28" fill="#000"/>
+  <rect x="284" y="284" width="82" height="82" rx="14" fill="#fff"/>
+  <rect x="302" y="302" width="46" height="46" rx="10" fill="#000"/>
 </svg>

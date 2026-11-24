@@ -1,10 +1,28 @@
-const CACHE_NAME = 'spelu-kaste-v6';
+/* Spēļu kaste — service worker
+ * Versiju maina TIKAI šeit (VERSION). Manifestā un HTML nekādu ?v= nav.
+ * Stratēģija:
+ *  - install: precache visus resursus; netiek aktivizēts pats (gaida lietotāja "Atjaunināt")
+ *  - fetch (same-origin GET): stale-while-revalidate, atslēga = bez query string
+ *  - navigācija bez tīkla: krīt atpakaļ uz kešoto lapu vai index.html
+ */
+const VERSION = '7.0.0';
+const CACHE_NAME = 'spelu-kaste-' + VERSION;
+
 const ASSETS = [
   './',
   './index.html',
   './spele15.html',
   './koka-bloki.html',
   './manifest.json',
+  './shared.css',
+  './shared.js',
+  './hub.css',
+  './spele15.css',
+  './spele15.js',
+  './koka-bloki.css',
+  './koka-bloki.js',
+  './fonts/fredoka-latin-wght-normal.woff2',
+  './fonts/fredoka-latin-ext-wght-normal.woff2',
   './icon.svg',
   './icon-maskable.svg',
   './icon-monochrome.svg',
@@ -12,61 +30,62 @@ const ASSETS = [
   './icon-512.png',
   './icon-maskable-512.png',
   './icon-mono-192.png',
-  './icon-mono-512.png'
+  './icon-mono-512.png',
+  './apple-touch-icon.png'
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then((cache) =>
+      // cache: 'reload' — lai precache nekad nepaņem vecu versiju no HTTP keša
+      Promise.all(ASSETS.map((u) => cache.add(new Request(u, { cache: 'reload' }))))
+    )
   );
-  self.skipWaiting();
+  // skipWaiting NAV: lapa pati pasaka, kad lietotājs nospiež "Atjaunināt"
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-    )
+    caches.keys()
+      .then((keys) => Promise.all(keys.filter((k) => k.startsWith('spelu-kaste-') && k !== CACHE_NAME).map((k) => caches.delete(k))))
+      .then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
+function cacheKey(url) {
+  // ./koka-bloki.html?action=new  ->  ./koka-bloki.html
+  return new Request(url.origin + url.pathname);
+}
+
 self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return;
+  const req = event.request;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
 
-  const url = new URL(event.request.url);
+  event.respondWith((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    const key = cacheKey(url);
+    const cached = await cache.match(key);
 
-  if (url.origin === 'https://fonts.googleapis.com' || url.origin === 'https://fonts.gstatic.com') {
-    event.respondWith(
-      caches.open(CACHE_NAME).then((cache) =>
-        cache.match(event.request).then((cached) => {
-          const fetched = fetch(event.request).then((resp) => {
-            if (resp && resp.status === 200) {
-              cache.put(event.request, resp.clone());
-            }
-            return resp;
-          }).catch(() => cached);
-          return cached || fetched;
-        })
-      )
-    );
-    return;
-  }
-
-  event.respondWith(
-    caches.open(CACHE_NAME).then((cache) =>
-      cache.match(event.request, { ignoreSearch: true }).then((cached) => {
-        const networkFetch = fetch(event.request)
-          .then((response) => {
-            if (response && response.status === 200) {
-              cache.put(event.request, response.clone());
-            }
-            return response;
-          })
-          .catch(() => cached || caches.match('./index.html'));
-
-        return cached || networkFetch;
+    const network = fetch(req)
+      .then((resp) => {
+        if (resp && resp.status === 200 && resp.type === 'basic') cache.put(key, resp.clone());
+        return resp;
       })
-    )
-  );
+      .catch(() => null);
+
+    if (cached) {
+      event.waitUntil(network); // atjaunina kešu fonā
+      return cached;
+    }
+    const resp = await network;
+    if (resp) return resp;
+    if (req.mode === 'navigate') return (await cache.match('./index.html')) || Response.error();
+    return Response.error();
+  })());
 });

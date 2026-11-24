@@ -4,313 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#FFF3B0" id="meta-theme" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Spēļu kaste" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <title>Spēļu kaste</title>
-  <link rel="manifest" href="./manifest.json?v=6" />
+  <link rel="manifest" href="./manifest.json" />
   <link rel="icon" type="image/svg+xml" href="./icon.svg" />
-  <link rel="apple-touch-icon" href="./icon-maskable.svg" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg-base: #FFF3B0;
-      --bg-dot: #F4DC7A;
-      --ink: #1E1B18;
-      --surface: #FFFFFF;
-      --pill-bg: #FFF3B0;
-      --title-shadow: rgba(255, 255, 255, 0.85);
-    }
-
-    body.dark-mode {
-      --bg-base: #1C1E26;
-      --bg-dot: #2A2E3B;
-      --ink: #121318;
-      --surface: #2B2F3C;
-      --pill-bg: #20232E;
-      --title-shadow: rgba(0, 0, 0, 0.45);
-    }
-
-    body.dark-mode .hub-title,
-    body.dark-mode .hub-sub,
-    body.dark-mode .game-card,
-    body.dark-mode .hub-footer,
-    body.dark-mode .theme-toggle-btn {
-      color: #F8FAFC;
-    }
-
-    body.dark-mode .card-best {
-      color: #FFD13B;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html {
-      background-color: #FFF3B0;
-    }
-    html, body {
-      width: 100%;
-      height: 100dvh;
-      overflow: hidden;
-      background-color: var(--bg-base);
-      background-image: radial-gradient(var(--bg-dot) 2.5px, transparent 2.5px);
-      background-size: 24px 24px;
-      color: var(--ink);
-      font-family: 'Fredoka', system-ui, -apple-system, sans-serif;
-    }
-
-    .bg-deco {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      overflow: hidden;
-    }
-
-    .shape {
-      position: absolute;
-      opacity: 0.42;
-      animation: floatShape 9s ease-in-out infinite;
-    }
-
-    .shape.circle {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: #FF9F87;
-      border: 2.5px solid var(--ink);
-      top: 15%;
-      left: 8%;
-    }
-
-    .shape.triangle {
-      width: 0;
-      height: 0;
-      border-left: 13px solid transparent;
-      border-right: 13px solid transparent;
-      border-bottom: 24px solid #A7F3D0;
-      bottom: 14%;
-      left: 8%;
-      animation-delay: -3s;
-    }
-
-    .shape.square {
-      width: 20px;
-      height: 20px;
-      border-radius: 6px;
-      background: #C4B5FD;
-      border: 2.5px solid var(--ink);
-      bottom: 22%;
-      right: 7%;
-      transform: rotate(15deg);
-      animation-delay: -5s;
-    }
-
-    @keyframes floatShape {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-10px) rotate(12deg); }
-    }
-
-    .app {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      max-width: 460px;
-      height: 100dvh;
-      margin: 0 auto;
-      padding: calc(env(safe-area-inset-top, 16px) + 18px) 22px calc(env(safe-area-inset-bottom, 16px) + 22px);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .hub-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .hub-title {
-      font-size: 34px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: var(--ink);
-      text-shadow: 3px 3px 0px var(--title-shadow);
-    }
-
-    .hub-sub {
-      font-size: 15px;
-      font-weight: 700;
-      opacity: 0.78;
-      margin-top: 2px;
-    }
-
-    .theme-toggle-btn {
-      width: 48px;
-      height: 48px;
-      flex-shrink: 0;
-      background: var(--surface);
-      border: 3px solid var(--ink);
-      border-radius: 16px;
-      box-shadow: 0 4px 0 var(--ink);
-      color: var(--ink);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: transform 0.08s ease, box-shadow 0.08s ease;
-    }
-
-    .theme-toggle-btn:active {
-      transform: translateY(3px);
-      box-shadow: 0 1px 0 var(--ink);
-    }
-
-    .games-list {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      gap: 18px;
-      padding-bottom: 18px;
-    }
-
-    .game-card {
-      position: relative;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      background: var(--surface);
-      border: 3.5px solid var(--ink);
-      border-radius: 28px;
-      box-shadow: 0 7px 0 var(--ink);
-      padding: 18px;
-      text-decoration: none;
-      color: var(--ink);
-      transition: transform 0.1s ease, box-shadow 0.1s ease;
-    }
-
-    .game-card:active {
-      transform: translateY(5px);
-      box-shadow: 0 2px 0 var(--ink);
-    }
-
-    .card-thumb {
-      width: 76px;
-      height: 76px;
-      flex-shrink: 0;
-      border-radius: 20px;
-      border: 3px solid var(--ink);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .thumb-15 {
-      background: #5BC0EB;
-    }
-
-    .thumb-15-tile {
-      width: 52px;
-      height: 52px;
-      background: #FFD13B;
-      color: #1E1B18;
-      border: 2.5px solid var(--ink);
-      border-radius: 13px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      font-weight: 800;
-      box-shadow: 0 3px 0 var(--ink);
-    }
-
-    .thumb-wood {
-      background: radial-gradient(circle at 30% 30%, #c9884c, #7b4a26);
-    }
-
-    .wood-mini-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 22px);
-      grid-template-rows: repeat(2, 22px);
-      gap: 4px;
-    }
-
-    .wood-cell {
-      border-radius: 6px;
-      border: 2.5px solid var(--ink);
-      background: #ffd859;
-      box-shadow: inset 0 2px 0 rgba(255,255,255,0.5);
-    }
-
-    .wood-cell.empty {
-      background: rgba(46, 22, 6, 0.45);
-      border-color: rgba(30, 27, 24, 0.5);
-      box-shadow: none;
-    }
-
-    .card-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .card-title {
-      font-size: 23px;
-      font-weight: 800;
-      line-height: 1.15;
-    }
-
-    .card-desc {
-      font-size: 14px;
-      font-weight: 600;
-      opacity: 0.78;
-      margin-top: 4px;
-    }
-
-    .card-best {
-      display: inline-block;
-      margin-top: 8px;
-      background: var(--pill-bg);
-      border: 2px solid var(--ink);
-      border-radius: 999px;
-      padding: 2px 10px;
-      font-size: 12px;
-      font-weight: 800;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .play-arrow {
-      width: 46px;
-      height: 46px;
-      flex-shrink: 0;
-      border-radius: 50%;
-      background: #34D399;
-      color: #1E1B18;
-      border: 3px solid var(--ink);
-      box-shadow: 0 3px 0 var(--ink);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .hub-footer {
-      text-align: center;
-      font-size: 13px;
-      font-weight: 700;
-      opacity: 0.65;
-    }
-  </style>
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+  <link rel="preload" href="./fonts/fredoka-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="./shared.css" />
+  <link rel="stylesheet" href="./hub.css" />
+  <script src="./shared.js"></script>
 </head>
 <body>
   <div class="bg-deco" aria-hidden="true">
@@ -326,10 +31,10 @@
         <p class="hub-sub">Izvēlies spēli brīvam brīdim</p>
       </div>
       <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Pārslēgt dienas vai nakts režīmu">
-        <svg id="theme-icon-moon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+        <svg id="theme-icon-moon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
         </svg>
-        <svg id="theme-icon-sun" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+        <svg id="theme-icon-sun" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="display:none;" aria-hidden="true">
           <circle cx="12" cy="12" r="5"/>
           <line x1="12" y1="1" x2="12" y2="3"/>
           <line x1="12" y1="21" x2="12" y2="23"/>
@@ -345,7 +50,7 @@
 
     <section class="games-list">
       <a href="./spele15.html" class="game-card">
-        <div class="card-thumb thumb-15">
+        <div class="card-thumb thumb-15" aria-hidden="true">
           <div class="thumb-15-tile">15</div>
         </div>
         <div class="card-info">
@@ -361,7 +66,7 @@
       </a>
 
       <a href="./koka-bloki.html" class="game-card">
-        <div class="card-thumb thumb-wood">
+        <div class="card-thumb thumb-wood" aria-hidden="true">
           <div class="wood-mini-grid">
             <div class="wood-cell"></div>
             <div class="wood-cell"></div>
@@ -388,57 +93,42 @@
   </main>
 
   <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
+    (() => {
+      const moonIcon = document.getElementById('theme-icon-moon');
+      const sunIcon = document.getElementById('theme-icon-sun');
+
+      function syncIcons() {
+        const isDark = document.documentElement.classList.contains('dark-mode');
+        moonIcon.style.display = isDark ? 'none' : 'block';
+        sunIcon.style.display = isDark ? 'block' : 'none';
+        SK.applyDark(isDark);
+      }
+      syncIcons();
+
+      document.getElementById('theme-toggle-btn').addEventListener('click', () => {
+        SK.setDark(!document.documentElement.classList.contains('dark-mode'));
+        syncIcons();
       });
-    }
 
-    const themeBtn = document.getElementById('theme-toggle-btn');
-    const moonIcon = document.getElementById('theme-icon-moon');
-    const sunIcon = document.getElementById('theme-icon-sun');
-    const metaTheme = document.getElementById('meta-theme');
-
-    function applyHubTheme(isDark) {
-      document.body.classList.toggle('dark-mode', isDark);
-      moonIcon.style.display = isDark ? 'none' : 'block';
-      sunIcon.style.display = isDark ? 'block' : 'none';
-      metaTheme.setAttribute('content', isDark ? '#1C1E26' : '#FFF3B0');
-    }
-
-    const savedTheme = localStorage.getItem('spelu_kaste_theme');
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    applyHubTheme(savedTheme === 'dark' || (!savedTheme && prefersDark));
-
-    themeBtn.addEventListener('click', () => {
-      const nextDark = !document.body.classList.contains('dark-mode');
-      localStorage.setItem('spelu_kaste_theme', nextDark ? 'dark' : 'light');
-      applyHubTheme(nextDark);
-    });
-
-    function refreshBadges() {
-      try {
-        const kokaBest = localStorage.getItem('koka_bloki_best');
-        if (kokaBest && Number(kokaBest) > 0) {
+      function refreshBadges() {
+        const kokaBest = Number(SK.get('koka_bloki_best', '0'));
+        if (kokaBest > 0) {
           const badge = document.getElementById('koka-best-badge');
           badge.textContent = `★ Rekords: ${kokaBest} p.`;
           badge.style.display = 'inline-block';
         }
 
-        const s15Raw = localStorage.getItem('spele15_best_4');
-        if (s15Raw) {
-          const s15 = JSON.parse(s15Raw);
-          const m = String(Math.floor(s15.seconds / 60)).padStart(2, '0');
-          const s = String(s15.seconds % 60).padStart(2, '0');
+        const s15 = SK.getJSON('spele15_best_4');
+        if (s15 && Number.isFinite(s15.seconds) && Number.isFinite(s15.moves)) {
           const badge15 = document.getElementById('spele15-best-badge');
-          badge15.textContent = `★ 4×4: ${m}:${s} (${s15.moves} gāj.)`;
+          badge15.textContent = `★ 4×4: ${SK.formatTime(s15.seconds)} (${s15.moves} gāj.)`;
           badge15.style.display = 'inline-block';
         }
-      } catch (e) {}
-    }
+      }
 
-    refreshBadges();
-    window.addEventListener('pageshow', refreshBadges);
+      refreshBadges();
+      window.addEventListener('pageshow', refreshBadges);
+    })();
   </script>
 </body>
 </html>
