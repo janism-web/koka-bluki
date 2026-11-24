@@ -1,19 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <rect width="512" height="512" rx="112" fill="#5BC0EB" stroke="#1E1B18" stroke-width="24"/>
   <rect x="44" y="44" width="424" height="424" rx="84" fill="#3A9BC7" stroke="#1E1B18" stroke-width="18"/>
-  <!-- Top-left tile "15" -->
   <rect x="78" y="78" width="166" height="166" rx="34" fill="#FFD13B" stroke="#1E1B18" stroke-width="16"/>
-  <!-- Geometric "1" -->
   <path d="M114 142 L132 128 L132 194 M116 194 L148 194" fill="none" stroke="#1E1B18" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- Geometric "5" -->
   <path d="M206 128 L174 128 L172 156 C180 152 206 152 206 174 C206 192 184 198 168 188" fill="none" stroke="#1E1B18" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- Top-right star tile -->
   <rect x="268" y="78" width="166" height="166" rx="34" fill="#34D399" stroke="#1E1B18" stroke-width="16"/>
   <path d="M351 116 l12 24 l26 4 l-19 18 l5 26 l-24 -12 l-24 12 l5 -26 l-19 -18 l26 -4 z" fill="#FFD13B" stroke="#1E1B18" stroke-width="8" stroke-linejoin="round"/>
-  <!-- Bottom-left block -->
   <rect x="78" y="268" width="166" height="166" rx="34" fill="#FF9F87" stroke="#1E1B18" stroke-width="16"/>
   <rect x="116" y="306" width="90" height="90" rx="18" fill="#FFD859" stroke="#1E1B18" stroke-width="12"/>
-  <!-- Bottom-right wooden block -->
   <rect x="268" y="268" width="166" height="166" rx="34" fill="#C9884C" stroke="#1E1B18" stroke-width="16"/>
   <rect x="306" y="306" width="90" height="90" rx="18" fill="#FFD859" stroke="#1E1B18" stroke-width="12"/>
 </svg>

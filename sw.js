@@ -1,4 +1,4 @@
-const CACHE_NAME = 'spelu-kaste-v3';
+const CACHE_NAME = 'spelu-kaste-v5';
 const ASSETS = [
   './',
   './index.html',
@@ -7,7 +7,12 @@ const ASSETS = [
   './manifest.json',
   './icon.svg',
   './icon-maskable.svg',
-  './icon-monochrome.svg'
+  './icon-monochrome.svg',
+  './icon-192.png',
+  './icon-512.png',
+  './icon-maskable-512.png',
+  './icon-mono-192.png',
+  './icon-mono-512.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -31,7 +36,6 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(event.request.url);
 
-  // Cache Google Fonts dynamically for full offline support
   if (url.origin === 'https://fonts.googleapis.com' || url.origin === 'https://fonts.gstatic.com') {
     event.respondWith(
       caches.open(CACHE_NAME).then((cache) =>
@@ -49,7 +53,6 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Stale-While-Revalidate for local app files so GitHub Pages updates propagate seamlessly
   event.respondWith(
     caches.open(CACHE_NAME).then((cache) =>
       cache.match(event.request, { ignoreSearch: true }).then((cached) => {

@@ -36,6 +36,9 @@
     margin: 0;
     padding: 0;
   }
+  html {
+    background-color: #562f12;
+  }
   html, body {
     width: 100%;
     height: 100%;
@@ -1095,48 +1098,7 @@
   function scheduleDraw() {
     if (!rafPending) {
       rafPending = true;
-      document.getElementById("menu-hub-btn").addEventListener("click", () => {
-    saveGameState();
-    window.location.href = "./index.html";
-  });
-
-  document.getElementById("settings-modal").addEventListener("click", (e) => {
-    if (e.target.id === "settings-modal") {
-      disarmResetConfirm();
-      document.getElementById("settings-modal").classList.remove("show");
-    }
-  });
-
-  document.getElementById("themes-modal").addEventListener("click", (e) => {
-    if (e.target.id === "themes-modal") {
-      document.getElementById("themes-modal").classList.remove("show");
-    }
-  });
-
-  document.getElementById("settings-btn").addEventListener("click", () => {
-    try { history.pushState({ modalOpen: true }, ""); } catch (e) {}
-  });
-
-  window.addEventListener("popstate", () => {
-    const settingsM = document.getElementById("settings-modal");
-    const themesM = document.getElementById("themes-modal");
-    if (themesM.classList.contains("show")) {
-      themesM.classList.remove("show");
-      return;
-    }
-    if (settingsM.classList.contains("show")) {
-      disarmResetConfirm();
-      settingsM.classList.remove("show");
-      return;
-    }
-    if (hammerArmed) {
-      hammerArmed = false;
-      updateUI();
-      scheduleDraw();
-    }
-  });
-
-  scheduleDraw();
+      requestAnimationFrame(draw);
     }
   }
 
