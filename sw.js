@@ -5,7 +5,7 @@
  *  - fetch (same-origin GET): stale-while-revalidate, atslēga = bez query string
  *  - navigācija bez tīkla: krīt atpakaļ uz kešoto lapu vai index.html
  */
-const VERSION = '7.0.1';
+const VERSION = '7.0.2';
 const CACHE_NAME = 'spelu-kaste-' + VERSION;
 
 const ASSETS = [
@@ -21,8 +21,8 @@ const ASSETS = [
   './spele15.js',
   './koka-bloki.css',
   './koka-bloki.js',
-  './fonts/fredoka-latin-wght-normal.woff2',
-  './fonts/fredoka-latin-ext-wght-normal.woff2',
+  './fonts/nunito-latin-wght-normal.woff2',
+  './fonts/nunito-latin-ext-wght-normal.woff2',
   './icon.svg',
   './icon-maskable.svg',
   './icon-monochrome.svg',

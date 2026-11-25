@@ -11,7 +11,7 @@ Spēle 15 + Koka Bloki kā bezsaistes PWA. Bez būvēšanas soļa: tīrs HTML/CS
 | `shared.css`, `shared.js` | Kopīgais: fonts, dienas/nakts režīms, drošs `localStorage` (`SK`), SW reģistrācija + "Pieejama jauna versija" |
 | `sw.js` | Service worker (versija tikai šeit) |
 | `manifest.json` | PWA manifests (stabils `id: "./"`, bez `?v=`) |
-| `fonts/` | Fredoka (OFL licence), lokāli: `latin` + `latin-ext` (latviešu burti) |
+| `fonts/` | Nunito (OFL licence), lokāli: `latin` + `latin-ext` (visi latviešu burti; Fredoka tos neatbalstīja pilnībā) |
 | `icon-*.png/svg` | Ikonas: `any`, `maskable`, **`monochrome`** (tematiskā ikona), `apple-touch-icon.png` |
 | `tests/smoke.js` | Automātiskie testi |
 
