@@ -1,6 +1,6 @@
 {
   "name": "spelu-kaste",
-  "version": "7.0.0",
+  "version": "7.0.1",
   "private": true,
   "description": "Spēļu kaste — Spēle 15 un Koka Bloki (PWA)",
   "scripts": {

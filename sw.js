@@ -5,7 +5,7 @@
  *  - fetch (same-origin GET): stale-while-revalidate, atslēga = bez query string
  *  - navigācija bez tīkla: krīt atpakaļ uz kešoto lapu vai index.html
  */
-const VERSION = '7.0.0';
+const VERSION = '7.0.1';
 const CACHE_NAME = 'spelu-kaste-' + VERSION;
 
 const ASSETS = [
