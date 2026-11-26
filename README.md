@@ -38,6 +38,9 @@ Android krāso tikai instalētas lietotnes ikonu, kuras manifestā ir `purpose: 
 ## Ikonu stils
 Krāsainās ikonas (`icon.svg`, `icon-maskable.svg` un no tām renderētie PNG) ir vienotā stilā ar Android sistēmas ikonām: gaiši pelēcīgi zils fons `#E3E8F2`, tumšs siluets `#222831`. Visus PNG ģenerē no SVG (skat. `icon-monochrome.svg` kā avotu formām). Mainot ikonu, jāpaaugstina `VERSION` failā `sw.js`, un lietotne uz tālruņa jāpārinstalē (WebAPK ikona tiek fiksēta instalēšanas brīdī).
 
+## 7.0.3 — Koka Bloku noturība
+Žesta stāvoklis pašdziedē (jauns pieskāriens vienmēr sāk no tīra stāvokļa; pacelšana/atcelšana tiek ķerta uz `window`; `blur`/`visibilitychange` atceļ žestu). Zīmēšanas kļūda kadrā vairs neaptur visu ciklu. Slēpts/0-izmēra logs nesabojā kanvu. Pievienoti testi šiem gadījumiem.
+
 ## Kas mainīts pret v6
 **Kļūdas:** Koka Bloki avarēja ielādē (`rafPending` TDZ); šūpošanās efektā fons un bloki kustējās pretēji; `touch-action:none` bloķēja ritināšanu tēmu sarakstā.
 **PWA:** stabils `id`; fonts lokāli (iepriekš bezsaistē CSS netika kešots); PNG `apple-touch-icon`; jauna, tīra monohromā ikona (iepriekšējai bija tikai 0/255 alfa, bez izlīdzināšanas); SW ar stale-while-revalidate, kešs bez query string, atjaunināšana tikai pēc lietotāja piekrišanas.

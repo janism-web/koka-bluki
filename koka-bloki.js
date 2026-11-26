@@ -456,6 +456,7 @@ let lastDpr = 0;
 
 function resize(force) {
   const rect = canvas.parentElement.getBoundingClientRect();
+  if (rect.width < 50 || rect.height < 50) return;   // logs paslēpts / pārslēdzas — saglabā iepriekšējo izmēru
   const curDpr = Math.min(window.devicePixelRatio || 1, 2);
   if (!force && Math.abs(rect.width - lastRectW) < 0.5 && Math.abs(rect.height - lastRectH) < 0.5 && curDpr === lastDpr) return;
   lastRectW = rect.width;
@@ -893,7 +894,7 @@ function getBlockSprite(size, t) {
   const key = t.id + ":" + px;
   let sprite = spriteCache.get(key);
   if (sprite) return sprite;
-  if (spriteCache.size > 80) spriteCache.clear();
+  if (spriteCache.size > 300) spriteCache.clear();
   sprite = document.createElement("canvas");
   sprite.width = px;
   sprite.height = px;
@@ -905,6 +906,7 @@ function getBlockSprite(size, t) {
 }
 
 function drawWoodBlock(x, y, size, alpha = 1, isGhost = false, isHammerTarget = false, isLineHighlight = false) {
+  if (!Number.isFinite(size) || !Number.isFinite(x) || !Number.isFinite(y) || size < 0.5) return;
   const t = getActiveTheme();
   ctx.save();
   ctx.globalAlpha = alpha;
@@ -1069,7 +1071,25 @@ function renderStaticBackground(t) {
 
 let lastFrameT = 0;
 
+let drawErrors = 0;
+
 function draw() {
+  try {
+    drawFrame();
+    drawErrors = 0;
+  } catch (err) {
+    console.error("draw error", err);
+    lastFrameT = 0;
+    // atiestata kanvas stāvokli (neizlīdzinātie save() u.c.) un mēģina vēlreiz
+    try {
+      canvas.width = canvas.width;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    } catch (e2) {}
+    if (++drawErrors < 5) scheduleDraw();
+  }
+}
+
+function drawFrame() {
   rafPending = false;
   const t = getActiveTheme();
 
@@ -1102,7 +1122,9 @@ function draw() {
   const bxBase = boardX + shakeOffsetX;
   const framePad = 8;
 
-  ctx.drawImage(bgCanvas, 0, 0, width * dpr, height * dpr, shakeOffsetX, 0, width, height);
+  if (bgCanvas.width > 0 && bgCanvas.height > 0) {
+    ctx.drawImage(bgCanvas, 0, 0, width * dpr, height * dpr, shakeOffsetX, 0, width, height);
+  }
 
   if (hammerArmed) {
     ctx.save();
@@ -1415,33 +1437,44 @@ function onPointerUp(e) {
   dragState = null; scheduleDraw();
 }
 
-// Pointer Events: viens ceļš pelei, pirkstam un irbulim; setPointerCapture notur vilkšanu
-// arī ārpus kanvas; dragPointerId ignorē otro pirkstu.
+// Pointer Events: viens ceļš pelei, pirkstam un irbulim.
+// Aizsardzība pret "iestrēgušu" žestu: jauns primārais pieskāriens VIENMĒR sāk no tīra stāvokļa,
+// bet pacelšana / atcelšana tiek ķerta uz window (arī tad, ja kanva zaudē pointer capture).
+function resetDrag() {
+  dragPointerId = null;
+  if (dragState) {
+    dragState = null;
+    scheduleDraw();
+  }
+}
+
 canvas.addEventListener("pointerdown", (e) => {
   if (e.pointerType === "mouse" && e.button !== 0) return;
-  if (dragPointerId !== null) return;
+  if (!e.isPrimary) return;          // otrais pirksts tiek ignorēts
+  dragState = null;                  // iepriekšējais (iespējams, nenobeigtais) žests tiek atmests
+  dragPointerId = null;
   onPointerDown(e);
   if (dragState) {
     dragPointerId = e.pointerId;
     try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
   }
 });
-canvas.addEventListener("pointermove", (e) => {
+window.addEventListener("pointermove", (e) => {
   if (e.pointerId !== dragPointerId) return;
   onPointerMove(e);
 });
-canvas.addEventListener("pointerup", (e) => {
+window.addEventListener("pointerup", (e) => {
   ensureAudio(); // iOS: audio drīkst atbloķēt tikai pēc pieskāriena beigām
   if (e.pointerId !== dragPointerId) return;
   dragPointerId = null;
   onPointerUp(e);
 });
-canvas.addEventListener("pointercancel", (e) => {
+window.addEventListener("pointercancel", (e) => {
   if (e.pointerId !== dragPointerId) return;
-  dragPointerId = null;
-  dragState = null;   // atcelts žests — figūra paliek dokā
-  scheduleDraw();
+  resetDrag();                       // atcelts žests — figūra paliek dokā
 });
+window.addEventListener("blur", resetDrag);
+document.addEventListener("visibilitychange", () => { if (document.hidden) resetDrag(); });
 
 document.getElementById("undo-btn").addEventListener("click", () => {
   ensureAudio();
