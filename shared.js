@@ -113,5 +113,13 @@
   }
   registerSW();
 
+  function syncAppHeight() {
+    const h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+    if (h > 0) document.documentElement.style.setProperty('--app-h', h + 'px');
+  }
+  syncAppHeight();
+  window.addEventListener('resize', syncAppHeight);
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', syncAppHeight);
+
   window.SK = SK;
 })();

@@ -67,6 +67,7 @@ button, a, .tile { touch-action: manipulation; }
   height: 100vh;
   height: 100svh;
   height: 100dvh;
+  height: var(--app-h, 100dvh);
   margin: 0 auto;
   padding: calc(env(safe-area-inset-top, 10px) + 10px) 22px calc(env(safe-area-inset-bottom, 16px) + 20px);
   display: flex;
@@ -625,5 +626,11 @@ button, a, .tile { touch-action: manipulation; }
   }
   .shuffle-btn {
     height: 48px;
+  }
+}
+
+@media (display-mode: standalone) {
+  .app {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 28px);
   }
 }
