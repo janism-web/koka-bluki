@@ -1,10 +1,10 @@
-/* Spēļu kaste — service worker (v8.0.0)
+/* Spēļu kaste — service worker (v8.0.1)
  * Stratēģija:
  *  - install: precache visus resursus; netiek aktivizēts pats (gaida lietotāja "Atjaunināt")
  *  - fetch (same-origin GET): stingrs Cache-First, lai nesajauktu dažādu versiju failus
  *  - navigācija bez tīkla: krīt atpakaļ uz kešoto lapu vai index.html
  */
-const VERSION = '8.0.0';
+const VERSION = '8.0.1';
 const CACHE_NAME = 'spelu-kaste-' + VERSION;
 
 const ASSETS = [
