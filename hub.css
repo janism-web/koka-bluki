@@ -3,6 +3,9 @@
 :root.dark-mode { --pill-bg: #20232E; }
 :root.dark-mode .card-best { color: #FFD13B; }
 
+#theme-icon-sun { display: none; }
+:root.dark-mode #theme-icon-moon { display: none; }
+:root.dark-mode #theme-icon-sun { display: block; }
 
 .shape.circle {
   width: 24px;
@@ -86,6 +89,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  touch-action: manipulation;
   transition: transform 0.08s ease, box-shadow 0.08s ease;
 }
 
@@ -115,6 +119,7 @@
   padding: 18px;
   text-decoration: none;
   color: var(--text);
+  touch-action: manipulation;
   transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 

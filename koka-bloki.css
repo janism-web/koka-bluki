@@ -1,3 +1,7 @@
+@view-transition {
+  navigation: auto;
+}
+
 /* Koka Bloki */
 :root {
   --bg-radial: radial-gradient(circle at 50% 25%, #c9884c 0%, #874f26 65%, #562f12 100%);
@@ -83,7 +87,7 @@ body::before {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: calc(env(safe-area-inset-top, 0px) + 10px) 14px calc(env(safe-area-inset-bottom, 0px) + 12px) 14px;
+  padding: calc(env(safe-area-inset-top, 0px) + 10px) 20px calc(env(safe-area-inset-bottom, 0px) + 12px) 20px;
 }
 
 .header {

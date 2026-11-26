@@ -50,7 +50,6 @@
     SK.setJSON(STATE_KEY, { size, board, moves, seconds });
   }
 
-  // Pārbauda, vai saglabātais laukums ir derīga permutācija 0..n²-1 un atrisināms
   function isValidSavedBoard(st) {
     if (!st || !VALID_SIZES.includes(st.size) || !Array.isArray(st.board)) return false;
     const total = st.size * st.size;
@@ -108,8 +107,6 @@
     timerEl.textContent = formatTime(seconds);
   }
 
-  // Laiks tiek rēķināts no performance.now() starpības, nevis skaitot setInterval tikšķus:
-  // tā nav dreifa, ja pārlūks intervālu aizkavē.
   function tick() {
     const now = performance.now();
     if (!isPaused && !isWon) {
@@ -189,7 +186,6 @@
     return arr;
   }
 
-  // Measured only on build & resize to prevent layout thrashing during gameplay
   function computeMetrics() {
     const width = tilesLayerEl.clientWidth > 0 ? tilesLayerEl.clientWidth : 290;
     tileSize = (width - GAP * (size - 1)) / size;
@@ -227,6 +223,7 @@
       if (val % 3 === 0) tile.classList.add('alt');
 
       tile.setAttribute('role', 'button');
+      tile.tabIndex = 0;
       tile.setAttribute('aria-label', `Flīze ${val}`);
 
       const star = document.createElement('span');
@@ -261,6 +258,7 @@
       const x = col * cellStep;
       const y = row * cellStep;
 
+      tile.classList.remove('dragging');
       tile.style.transform = `translate3d(${x}px, ${y}px, 0)`;
       tile.classList.toggle('correct', val === idx + 1);
     }
@@ -318,13 +316,22 @@
   }
 
   function attachTilePointer(tile, tileVal) {
+    tile.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        if (isPaused || isWon) return;
+        e.preventDefault();
+        const group = getMovableGroup(tileVal);
+        if (group) executeMove(group);
+      }
+    });
+
     tile.addEventListener('pointerdown', (e) => {
       if (isPaused || isWon) return;
       const group = getMovableGroup(tileVal);
       if (!group) return;
 
       e.preventDefault();
-      tile.setPointerCapture(e.pointerId);
+      try { tile.setPointerCapture(e.pointerId); } catch (err) {}
 
       const startX = e.clientX;
       const startY = e.clientY;
@@ -339,6 +346,14 @@
         el.classList.add('dragging');
         return { el, baseX: c * cellStep, baseY: r * cellStep };
       });
+
+      const cleanup = () => {
+        tile.removeEventListener('pointermove', onPointerMove);
+        tile.removeEventListener('pointerup', onPointerUp);
+        tile.removeEventListener('pointercancel', onPointerCancel);
+        window.removeEventListener('blur', onPointerCancel);
+        groupTiles.forEach(({ el }) => el.classList.remove('dragging'));
+      };
 
       const onPointerMove = (ev) => {
         const dx = ev.clientX - startX;
@@ -355,13 +370,13 @@
         });
       };
 
+      const onPointerCancel = () => {
+        cleanup();
+        renderTiles();
+      };
+
       const onPointerUp = () => {
-        tile.removeEventListener('pointermove', onPointerMove);
-        tile.removeEventListener('pointerup', onPointerUp);
-        tile.removeEventListener('pointercancel', onPointerUp);
-
-        groupTiles.forEach(({ el }) => el.classList.remove('dragging'));
-
+        cleanup();
         if (!moved || currentOffset > cellStep * 0.3) {
           executeMove(group);
         } else {
@@ -371,7 +386,8 @@
 
       tile.addEventListener('pointermove', onPointerMove);
       tile.addEventListener('pointerup', onPointerUp);
-      tile.addEventListener('pointercancel', onPointerUp);
+      tile.addEventListener('pointercancel', onPointerCancel);
+      window.addEventListener('blur', onPointerCancel);
     });
   }
 
@@ -482,7 +498,6 @@
     }
   });
 
-  // Tastatūra: bultiņas pārbīda flīzi bultiņas virzienā; Esc — pauze
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       if (winModal.classList.contains('open')) { winModal.classList.remove('open'); return; }
@@ -514,6 +529,7 @@
   window.addEventListener('pagehide', saveGameState);
   document.addEventListener('visibilitychange', () => {
     if (document.hidden && moves > 0 && !isWon) {
+      renderTiles();
       saveGameState();
       setPaused(true);
     }

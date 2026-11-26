@@ -73,15 +73,48 @@ button, a, .tile { touch-action: manipulation; }
   justify-content: space-between;
 }
 
+.app > header,
+.bottom-controls {
+  flex-shrink: 0;
+}
+
 .top-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   padding: 2px 0;
 }
 
+.title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.back-hub-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 13px;
+  background: var(--surface);
+  border: 2.5px solid var(--ink);
+  box-shadow: 0 3px 0 var(--ink);
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.back-hub-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--ink);
+}
+
 .title {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--text);
@@ -154,14 +187,14 @@ button, a, .tile { touch-action: manipulation; }
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 0;
+  padding: 10px 0;
   min-height: 0;
 }
 
 .board-frame {
   position: relative;
-  width: min(100%, 348px, 46vh);
-  width: min(100%, 348px, 46dvh);
+  width: min(100%, 348px, calc(100vh - 290px));
+  width: min(100%, 348px, calc(100dvh - 290px));
   aspect-ratio: 1 / 1;
   background: var(--board-bg);
   border: 4px solid var(--ink);
@@ -268,15 +301,17 @@ button, a, .tile { touch-action: manipulation; }
   position: relative;
   z-index: 2;
   color: #FFFFFF;
-  -webkit-text-stroke: 2px var(--ink);
-  paint-order: stroke fill;
-  text-shadow: 0 2px 0 var(--ink);
+  text-shadow:
+    -1.5px -1.5px 0 var(--ink),
+     1.5px -1.5px 0 var(--ink),
+    -1.5px  1.5px 0 var(--ink),
+     1.5px  1.5px 0 var(--ink),
+     0px    2.5px 0 var(--ink);
   pointer-events: none;
 }
 
 .tile.correct .tile-num {
   color: var(--ink);
-  -webkit-text-stroke: 0;
   text-shadow: none;
 }
 
@@ -529,9 +564,68 @@ button, a, .tile { touch-action: manipulation; }
   margin-top: 2px;
 }
 
+.win-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.win-hub-btn {
+  height: 54px;
+  padding: 0 18px;
+  background: var(--surface-soft);
+  border: var(--border-w) solid var(--ink);
+  border-radius: 999px;
+  box-shadow: 0 5px 0 var(--ink);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.win-hub-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--ink);
+}
+
 #confetti-canvas {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 60;
+}
+
+@media (max-height: 740px) {
+  .app {
+    padding-top: calc(env(safe-area-inset-top, 6px) + 8px);
+    padding-bottom: calc(env(safe-area-inset-bottom, 8px) + 10px);
+  }
+  .stats-row {
+    margin-top: 6px;
+  }
+  .stat-pill,
+  .pause-btn {
+    height: 40px;
+  }
+  .board-stage {
+    padding: 6px 0;
+  }
+  .board-frame {
+    width: min(100%, 348px, calc(100vh - 245px));
+    width: min(100%, 348px, calc(100dvh - 245px));
+  }
+  .bottom-controls {
+    gap: 8px;
+  }
+  .size-btn {
+    height: 42px;
+  }
+  .shuffle-btn {
+    height: 48px;
+  }
 }

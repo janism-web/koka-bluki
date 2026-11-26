@@ -2,16 +2,17 @@
 <html lang="lv" data-no-dark>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#7b4a26" id="meta-theme-color">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Koka Bloki">
+<meta name="apple-mobile-web-app-title" content="Koka bloki">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Koka Bloki — Spēļu kaste</title>
+<title>Koka bloki — Spēļu kaste</title>
 <link rel="manifest" href="./manifest.json">
 <link rel="icon" type="image/svg+xml" href="./icon.svg">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="preload" href="./fonts/nunito-latin-ext-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="./fonts/nunito-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="./koka-bloki.css">
 <script src="./shared.js"></script>
 </head>
@@ -42,7 +43,7 @@
       <div class="stat-value" id="combo-val">0</div>
     </div>
 
-    <button class="btn-settings" id="settings-btn" aria-label="Izvēlne">
+    <button class="btn-settings" id="settings-btn" type="button" aria-label="Izvēlne">
       <svg class="m-icon m-icon-lg" viewBox="0 0 24 24">
         <circle cx="12" cy="12" r="3"/>
         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
@@ -51,17 +52,17 @@
   </div>
 
   <div class="action-bar">
-    <button class="btn-action" id="undo-btn">
+    <button class="btn-action" id="undo-btn" type="button">
       <svg class="m-icon" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11"/></svg>
       <span>Atsaukt</span>
       <span class="badge-count" id="undo-count">1</span>
     </button>
-    <button class="btn-action" id="hammer-btn">
+    <button class="btn-action" id="hammer-btn" type="button">
       <svg class="m-icon" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
       <span>Āmurs</span>
       <span class="badge-count" id="hammer-count">1</span>
     </button>
-    <button class="btn-action" id="reroll-btn">
+    <button class="btn-action" id="reroll-btn" type="button">
       <svg class="m-icon" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
       <span>Maiņa</span>
       <span class="badge-count" id="reroll-count">1</span>
@@ -73,25 +74,25 @@
       <svg class="m-icon m-icon-sm" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
       <span id="status-text">Pieskaries figūrai apakšā, lai pagrieztu</span>
     </div>
-    <button class="btn-cancel-hammer" id="cancel-hammer-btn">
+    <button class="btn-cancel-hammer" id="cancel-hammer-btn" type="button">
       <svg class="m-icon m-icon-sm" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
       <span>Atcelt āmuru</span>
     </button>
   </div>
 
   <div id="canvas-container">
-    <canvas id="gameCanvas" role="img" aria-label="Koka Bloku spēles laukums"></canvas>
+    <canvas id="gameCanvas" role="img" aria-label="Koka bloku spēles laukums"></canvas>
   </div>
 </div>
 
 <!-- Game Over Modal -->
-<div class="modal-backdrop" id="gameover-modal">
+<div class="modal-backdrop" id="gameover-modal" role="dialog" aria-modal="true" aria-labelledby="gameover-title">
   <div class="modal-card">
     <div class="modal-badge" id="modal-record-badge">
       <svg class="m-icon m-icon-sm" viewBox="0 0 24 24"><path d="M3 18h18M4 15l2-9 6 5 6-5 2 9H4z"/></svg>
       <span>Jauns rekords</span>
     </div>
-    <div class="modal-title">Spēle beigusies</div>
+    <div class="modal-title" id="gameover-title">Spēle beigusies</div>
     <div class="modal-sub">Nav brīvas vietas atlikušajām figūrām</div>
     <div class="modal-scores-row">
       <div class="modal-score-box">
@@ -104,16 +105,16 @@
       </div>
     </div>
     <div class="modal-secondary-row">
-      <button class="btn-secondary" id="peek-board-btn">
+      <button class="btn-secondary" id="peek-board-btn" type="button">
         <svg class="m-icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
         <span>Laukums</span>
       </button>
-      <button class="btn-secondary" id="share-score-btn">
+      <button class="btn-secondary" id="share-score-btn" type="button">
         <svg class="m-icon" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>
         <span id="share-btn-label">Dalīties</span>
       </button>
     </div>
-    <button class="btn-primary" id="modal-restart-btn">
+    <button class="btn-primary" id="modal-restart-btn" type="button">
       <svg class="m-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3" fill="currentColor" stroke="none"/></svg>
       <span>Spēlēt vēlreiz</span>
     </button>
@@ -121,7 +122,7 @@
 </div>
 
 <!-- Settings / Menu Modal -->
-<div class="modal-backdrop" id="settings-modal">
+<div class="modal-backdrop" id="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
   <div class="modal-card">
     <div class="modal-header-icon">
       <svg class="m-icon m-icon-lg" viewBox="0 0 24 24">
@@ -129,31 +130,31 @@
         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
       </svg>
     </div>
-    <div class="modal-title">Izvēlne</div>
+    <div class="modal-title" id="settings-title">Izvēlne</div>
     <div class="modal-sub">Spēles iestatījumi un opcijas</div>
     <div class="settings-list">
-      <button class="settings-btn-row" id="menu-hub-btn">
+      <button class="settings-btn-row" id="menu-hub-btn" type="button">
         <span class="settings-row-left">
           <svg class="m-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
           <span>Spēļu kaste</span>
         </span>
         <span class="settings-pill-val">Izvēlne</span>
       </button>
-      <button class="settings-btn-row" id="menu-themes-btn">
+      <button class="settings-btn-row" id="menu-themes-btn" type="button">
         <span class="settings-row-left">
           <svg class="m-icon" viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
           <span>Materiālu tēmas</span>
         </span>
         <span class="settings-pill-val" id="menu-theme-name">Ozols</span>
       </button>
-      <button class="settings-btn-row" id="menu-sound-btn">
+      <button class="settings-btn-row" id="menu-sound-btn" type="button">
         <span class="settings-row-left">
           <svg class="m-icon" id="menu-sound-icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
           <span>Skaņas efekti</span>
         </span>
         <span class="settings-pill-val" id="menu-sound-state">Ieslēgta</span>
       </button>
-      <button class="settings-btn-row" id="menu-reset-btn">
+      <button class="settings-btn-row" id="menu-reset-btn" type="button">
         <span class="settings-row-left">
           <svg class="m-icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
           <span id="menu-reset-label">Sākt jaunu spēli</span>
@@ -161,17 +162,17 @@
         <span class="settings-pill-val" id="menu-reset-pill">No nulles</span>
       </button>
     </div>
-    <button class="btn-primary" id="close-settings-btn">Turpināt spēli</button>
+    <button class="btn-primary" id="close-settings-btn" type="button">Turpināt spēli</button>
   </div>
 </div>
 
 <!-- Themes Modal -->
-<div class="modal-backdrop" id="themes-modal">
+<div class="modal-backdrop" id="themes-modal" role="dialog" aria-modal="true" aria-labelledby="themes-title">
   <div class="modal-card">
-    <div class="modal-title">Materiālu tēmas</div>
+    <div class="modal-title" id="themes-title">Materiālu tēmas</div>
     <div class="modal-sub">Atbloķē jaunas tēmas, uzstādot augstāku rekordu</div>
     <div class="theme-list" id="theme-list"></div>
-    <button class="btn-primary" id="close-themes-btn">Atpakaļ</button>
+    <button class="btn-primary" id="close-themes-btn" type="button">Atpakaļ</button>
   </div>
 </div>
 <script src="./koka-bloki.js"></script>

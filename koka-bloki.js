@@ -1,7 +1,7 @@
 'use strict';
 (() => {
 const GRID_SIZE = 8;
-const FINGER_OFFSET_Y = 74;
+const FINGER_OFFSET_Y = 76;
 const TAP_THRESHOLD_PX = 14;
 const TAP_THRESHOLD_MS = 280;
 const MAGNETIC_SNAP_RATIO = 0.44;
@@ -334,8 +334,7 @@ let tray = [null, null, null];
 let score = 0;
 let displayedScore = 0;
 let committedBest = parseInt(SK.get(STORAGE_BEST_KEY, "0"), 10) || 0;
-// Rekords uz ekrāna = max(saglabātais, pašreizējais). Saglabā tikai komitējot,
-// tāpēc "Atsaukt" nevar uzpūst rekordu ar punktiem, kas tika atsaukti.
+
 function getBest() { return Math.max(committedBest, score); }
 function commitBest() {
   if (score > committedBest) {
@@ -449,14 +448,13 @@ function loadGameState() {
   }
 }
 
-// Proportional vertical distribution: eliminates top & bottom dead space on tall 20:9 displays
 let lastRectW = 0;
 let lastRectH = 0;
 let lastDpr = 0;
 
 function resize(force) {
   const rect = canvas.parentElement.getBoundingClientRect();
-  if (rect.width < 50 || rect.height < 50) return;   // logs paslēpts / pārslēdzas — saglabā iepriekšējo izmēru
+  if (rect.width < 50 || rect.height < 50) return;
   const curDpr = Math.min(window.devicePixelRatio || 1, 2);
   if (!force && Math.abs(rect.width - lastRectW) < 0.5 && Math.abs(rect.height - lastRectH) < 0.5 && curDpr === lastDpr) return;
   lastRectW = rect.width;
@@ -464,12 +462,12 @@ function resize(force) {
   lastDpr = curDpr;
   width = rect.width;
   height = rect.height;
-  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  dpr = curDpr;
   canvas.width = Math.floor(width * dpr);
   canvas.height = Math.floor(height * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-  const maxBoardW = width - 36;
+  const maxBoardW = width - 24;
   const minTopMargin = 10;
   const minBottomMargin = 10;
   const minGap = 16;
@@ -480,7 +478,6 @@ function resize(force) {
   trayHeight = Math.round(cellSize * 3.45);
 
   const freeVertical = Math.max(0, height - boardSize - trayHeight);
-  // Distribute free vertical space cleanly: ~22% top margin, ~44% between board & dock, ~34% bottom margin
   const topMargin = Math.max(8, Math.round(freeVertical * 0.22));
   const gapBetween = Math.max(14, Math.min(38, Math.round(freeVertical * 0.44)));
   const remainingBottom = height - topMargin - boardSize - gapBetween - trayHeight;
@@ -493,6 +490,7 @@ function resize(force) {
   bgCanvas.height = canvas.height;
   bgCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
   bgCacheValid = false;
+  spriteCache.clear();
   scheduleDraw();
 }
 
@@ -510,7 +508,6 @@ function randomPiece() {
   };
 }
 
-// Pamatā nejaušs, bet vismaz vienai figūrai jāiederas — lai spēle nebeigtos "negodīgi".
 function generateTray() {
   for (let attempt = 0; attempt < 40; attempt++) {
     const t = [randomPiece(), randomPiece(), randomPiece()];
@@ -532,7 +529,10 @@ let statusTimer = null;
 function setStatusMessage(msg) {
   document.getElementById("status-text").textContent = msg;
   clearTimeout(statusTimer);
-  if (msg !== DEFAULT_STATUS) statusTimer = setTimeout(() => setStatusMessage(DEFAULT_STATUS), 2800);
+  statusTimer = null;
+  if (msg !== DEFAULT_STATUS) {
+    statusTimer = setTimeout(() => setStatusMessage(DEFAULT_STATUS), 2800);
+  }
 }
 
 function celebrateNewRecord() {
@@ -587,7 +587,9 @@ function updateUI() {
   } else {
     statusBanner.style.display = "inline-flex";
     cancelHammerBtn.classList.remove("show");
-    setStatusMessage("Pieskaries figūrai apakšā, lai pagrieztu");
+    if (!statusTimer) {
+      document.getElementById("status-text").textContent = DEFAULT_STATUS;
+    }
   }
 }
 
@@ -777,7 +779,8 @@ function placePiece(piece, startR, startC, preMoveSnapshot) {
   }
 
   refillTrayIfEmpty();
-  updateUI(); scheduleDraw();
+  updateUI();
+  scheduleDraw();
   saveGameState();
   checkGameOver();
 }
@@ -854,8 +857,6 @@ function getPreviewClearedLines(piece, dropPos) {
   return { rows: previewRows, cols: previewCols };
 }
 
-// Koka bloka "sprite": gradients, nošķēlums un graudi tiek uzzīmēti VIENREIZ uz mazas kanvas
-// (uz tēmu + izmēru) un tālāk tikai kopēti ar drawImage — nevis pārrēķināti katrā kadrā.
 const spriteCache = new Map();
 
 function paintBlock(g, x, y, size, t) {
@@ -889,23 +890,23 @@ function paintBlock(g, x, y, size, t) {
   g.stroke();
 }
 
-function getBlockSprite(size, t) {
-  const px = Math.max(1, Math.round(size * dpr));
+function getBlockSprite(baseSize, t) {
+  const px = Math.max(1, Math.round(baseSize * dpr));
   const key = t.id + ":" + px;
   let sprite = spriteCache.get(key);
   if (sprite) return sprite;
-  if (spriteCache.size > 300) spriteCache.clear();
+  if (spriteCache.size > 32) spriteCache.clear();
   sprite = document.createElement("canvas");
   sprite.width = px;
   sprite.height = px;
   const g = sprite.getContext("2d");
-  g.scale(px / size, px / size);
-  paintBlock(g, 0, 0, size, t);
+  g.scale(px / baseSize, px / baseSize);
+  paintBlock(g, 0, 0, baseSize, t);
   spriteCache.set(key, sprite);
   return sprite;
 }
 
-function drawWoodBlock(x, y, size, alpha = 1, isGhost = false, isHammerTarget = false, isLineHighlight = false) {
+function drawWoodBlock(x, y, size, alpha = 1, isGhost = false, isHammerTarget = false, isLineHighlight = false, baseSize = size) {
   if (!Number.isFinite(size) || !Number.isFinite(x) || !Number.isFinite(y) || size < 0.5) return;
   const t = getActiveTheme();
   ctx.save();
@@ -924,7 +925,7 @@ function drawWoodBlock(x, y, size, alpha = 1, isGhost = false, isHammerTarget = 
     return;
   }
 
-  ctx.drawImage(getBlockSprite(size, t), x, y, size, size);
+  ctx.drawImage(getBlockSprite(baseSize, t), x, y, size, size);
 
   if (isHammerTarget || isLineHighlight) {
     const pad = Math.max(1.5, size * 0.045);
@@ -967,13 +968,11 @@ function getTraySlotCenter(index) {
   };
 }
 
-// Adaptive Piece Scaling: scales block size inside the dock slot based on piece dimensions
 function getAdaptiveDockCellSize(piece, slotInnerW, slotInnerH) {
   const rows = piece.shape.length;
   const cols = piece.shape[0].length;
   const maxDim = Math.max(rows, cols);
 
-  // Target ratio relative to main grid cellSize based on piece span
   let targetRatio = 0.60;
   if (maxDim === 1) targetRatio = 0.88;
   else if (maxDim === 2) targetRatio = 0.78;
@@ -1070,7 +1069,6 @@ function renderStaticBackground(t) {
 }
 
 let lastFrameT = 0;
-
 let drawErrors = 0;
 
 function draw() {
@@ -1080,9 +1078,7 @@ function draw() {
   } catch (err) {
     console.error("draw error", err);
     lastFrameT = 0;
-    // atiestata kanvas stāvokli (neizlīdzinātie save() u.c.) un mēģina vēlreiz
     try {
-      canvas.width = canvas.width;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     } catch (e2) {}
     if (++drawErrors < 5) scheduleDraw();
@@ -1093,7 +1089,6 @@ function drawFrame() {
   rafPending = false;
   const t = getActiveTheme();
 
-  // dt = 1.0 pie 60 Hz; animācijas ir vienādi ātras arī 90/120 Hz ekrānos
   const nowT = performance.now();
   const dt = lastFrameT ? Math.min(3, Math.max(0.25, (nowT - lastFrameT) / 16.667)) : 1;
   lastFrameT = nowT;
@@ -1141,7 +1136,7 @@ function drawFrame() {
         const cx = bxBase + c * cellSize;
         const cy = boardY + r * cellSize;
         const highlightCell = previewLines.rows.has(r) || previewLines.cols.has(c);
-        drawWoodBlock(cx, cy, cellSize, 1, false, hammerArmed, highlightCell);
+        drawWoodBlock(cx, cy, cellSize, 1, false, hammerArmed, highlightCell, cellSize);
       }
     }
   }
@@ -1160,7 +1155,8 @@ function drawFrame() {
             1,
             true,
             false,
-            highlightGhost
+            highlightGhost,
+            cellSize
           );
         }
       }
@@ -1219,7 +1215,11 @@ function drawFrame() {
             startX + c * dynCell * scale,
             startY + r * dynCell * scale,
             dynCell * scale,
-            hammerArmed ? 0.45 : 1
+            hammerArmed ? 0.45 : 1,
+            false,
+            false,
+            false,
+            dynCell
           );
         }
       }
@@ -1250,7 +1250,8 @@ function drawFrame() {
             0.95,
             false,
             false,
-            hasLineHighlight
+            hasLineHighlight,
+            cellSize
           );
         }
       }
@@ -1278,7 +1279,7 @@ function drawFrame() {
     const ft = floatingTexts[i];
     ctx.save();
     ctx.globalAlpha = Math.max(0, ft.life);
-    ctx.font = "900 22px -apple-system, BlinkMacSystemFont, sans-serif";
+    ctx.font = "900 22px 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif";
     ctx.textAlign = "center";
     ctx.strokeStyle = "#261003";
     ctx.lineWidth = 5;
@@ -1338,7 +1339,8 @@ function handleHammerClick(pos) {
         spawnParticles(px, py, 16);
         flashCells.push({ r: row, c: col, life: 1.0 });
 
-        updateUI(); scheduleDraw();
+        updateUI();
+        scheduleDraw();
         saveGameState();
         checkGameOver();
         return true;
@@ -1354,9 +1356,20 @@ function handleHammerClick(pos) {
   return false;
 }
 
+function getSlotAtX(x) {
+  const dockLeft = boardX - 8;
+  const dockWidth = boardSize + 16;
+  if (x < dockLeft - 14 || x > dockLeft + dockWidth + 14) return -1;
+  const rel = (x - dockLeft) / (dockWidth / 3);
+  return Math.max(0, Math.min(2, Math.floor(rel)));
+}
+
+function getFingerOffset() {
+  return Math.max(FINGER_OFFSET_Y, Math.round(cellSize * 1.85));
+}
+
 function onPointerDown(e) {
   if (e.cancelable) e.preventDefault();
-  ensureAudio();
   const pos = getCanvasCoords(e);
 
   if (hammerArmed) {
@@ -1364,19 +1377,27 @@ function onPointerDown(e) {
     return;
   }
 
-  if (pos.y >= trayY - 14) {
-    const slotIndex = Math.max(0, Math.min(2, Math.floor(pos.x / (width / 3))));
-    if (tray[slotIndex] !== null) {
+  if (pos.y >= trayY - 28 && pos.y <= trayY + trayHeight + 28) {
+    let slotIndex = getSlotAtX(pos.x);
+    if (slotIndex !== -1 && tray[slotIndex] === null) {
+      const altLeft = getSlotAtX(pos.x - 24);
+      const altRight = getSlotAtX(pos.x + 24);
+      if (altLeft !== -1 && tray[altLeft] !== null) slotIndex = altLeft;
+      else if (altRight !== -1 && tray[altRight] !== null) slotIndex = altRight;
+    }
+
+    if (slotIndex !== -1 && tray[slotIndex] !== null) {
       dragState = {
         index: slotIndex,
         startX: pos.x,
         startY: pos.y,
         currentX: pos.x,
-        currentY: pos.y - Math.max(68, Math.round(cellSize * 1.65)),
+        currentY: pos.y - getFingerOffset(),
         startTime: performance.now(),
         isDragging: false,
         lastSnapKey: null
       };
+      scheduleDraw();
     }
   }
 }
@@ -1397,15 +1418,13 @@ function onPointerMove(e) {
 
   if (dragState.isDragging) {
     dragState.currentX = pos.x;
-    dragState.currentY = pos.y - Math.max(68, Math.round(cellSize * 1.65));
+    dragState.currentY = pos.y - getFingerOffset();
+    scheduleDraw();
 
     const dropPos = getDropGridPos();
     const snapKey = dropPos ? `${dropPos.row},${dropPos.col}` : null;
     if (snapKey !== dragState.lastSnapKey) {
-      dragState.lastSnapKey = snapKey; scheduleDraw();
-      if (snapKey !== null) {
-        vibrate(6);
-      }
+      dragState.lastSnapKey = snapKey;
     }
   }
 }
@@ -1420,7 +1439,8 @@ function onPointerUp(e) {
   if (!dragState.isDragging && elapsed < TAP_THRESHOLD_MS + 150 && piece) {
     if (piece.rotatable) {
       piece.shape = rotateMatrix(piece.shape);
-      piece.animScale = 0.78; scheduleDraw();
+      piece.animScale = 0.78;
+      scheduleDraw();
       playWoodSound("rotate");
       vibrate(12);
       saveGameState();
@@ -1434,12 +1454,10 @@ function onPointerUp(e) {
     }
   }
 
-  dragState = null; scheduleDraw();
+  dragState = null;
+  scheduleDraw();
 }
 
-// Pointer Events: viens ceļš pelei, pirkstam un irbulim.
-// Aizsardzība pret "iestrēgušu" žestu: jauns primārais pieskāriens VIENMĒR sāk no tīra stāvokļa,
-// bet pacelšana / atcelšana tiek ķerta uz window (arī tad, ja kanva zaudē pointer capture).
 function resetDrag() {
   dragPointerId = null;
   if (dragState) {
@@ -1450,29 +1468,30 @@ function resetDrag() {
 
 canvas.addEventListener("pointerdown", (e) => {
   if (e.pointerType === "mouse" && e.button !== 0) return;
-  if (!e.isPrimary) return;          // otrais pirksts tiek ignorēts
-  dragState = null;                  // iepriekšējais (iespējams, nenobeigtais) žests tiek atmests
-  dragPointerId = null;
+  if (dragPointerId !== null) return;
   onPointerDown(e);
   if (dragState) {
     dragPointerId = e.pointerId;
-    try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
   }
-});
+}, { passive: false });
+
 window.addEventListener("pointermove", (e) => {
   if (e.pointerId !== dragPointerId) return;
   onPointerMove(e);
-});
+}, { passive: false });
+
 window.addEventListener("pointerup", (e) => {
-  ensureAudio(); // iOS: audio drīkst atbloķēt tikai pēc pieskāriena beigām
+  ensureAudio();
   if (e.pointerId !== dragPointerId) return;
   dragPointerId = null;
   onPointerUp(e);
-});
+}, { passive: false });
+
 window.addEventListener("pointercancel", (e) => {
   if (e.pointerId !== dragPointerId) return;
-  resetDrag();                       // atcelts žests — figūra paliek dokā
+  resetDrag();
 });
+
 window.addEventListener("blur", resetDrag);
 document.addEventListener("visibilitychange", () => { if (document.hidden) resetDrag(); });
 
@@ -1502,7 +1521,8 @@ document.getElementById("undo-btn").addEventListener("click", () => {
   playWoodSound("undo");
   vibrate([15, 25, 15]);
   addFloatingText(boardX + boardSize / 2, boardY + boardSize * 0.5, "Gājiens atsaukts");
-  updateUI(); scheduleDraw();
+  updateUI();
+  scheduleDraw();
   saveGameState();
 });
 
@@ -1520,13 +1540,15 @@ document.getElementById("hammer-btn").addEventListener("click", () => {
   }
   hammerArmed = !hammerArmed;
   playWoodSound("pickup");
-  updateUI(); scheduleDraw();
+  updateUI();
+  scheduleDraw();
 });
 
 document.getElementById("cancel-hammer-btn").addEventListener("click", () => {
   hammerArmed = false;
   playWoodSound("rotate");
-  updateUI(); scheduleDraw();
+  updateUI();
+  scheduleDraw();
 });
 
 document.getElementById("reroll-btn").addEventListener("click", () => {
@@ -1543,7 +1565,8 @@ document.getElementById("reroll-btn").addEventListener("click", () => {
   tray.forEach(p => { if (p) p.animScale = 0.65; });
   playWoodSound("rotate");
   vibrate([15, 20, 15]);
-  updateUI(); scheduleDraw();
+  updateUI();
+  scheduleDraw();
   saveGameState();
   checkGameOver();
 });
@@ -1566,7 +1589,8 @@ function disarmResetConfirm() {
 document.getElementById("settings-btn").addEventListener("click", () => {
   ensureAudio();
   hammerArmed = false;
-  updateUI(); scheduleDraw();
+  updateUI();
+  scheduleDraw();
   disarmResetConfirm();
   document.getElementById("menu-sound-state").textContent = soundEnabled ? "Ieslēgta" : "Izslēgta";
   document.getElementById("settings-modal").classList.add("show");
@@ -1575,6 +1599,12 @@ document.getElementById("settings-btn").addEventListener("click", () => {
 document.getElementById("close-settings-btn").addEventListener("click", () => {
   disarmResetConfirm();
   document.getElementById("settings-modal").classList.remove("show");
+});
+
+document.getElementById("menu-hub-btn").addEventListener("click", () => {
+  commitBest();
+  saveGameState();
+  window.location.href = "./index.html";
 });
 
 document.getElementById("menu-sound-btn").addEventListener("click", () => {
@@ -1617,6 +1647,10 @@ function renderThemesList() {
 
     const item = document.createElement("div");
     item.className = "theme-item" + (isSelected ? " selected" : "") + (!unlocked ? " locked" : "");
+    if (unlocked) {
+      item.setAttribute("role", "button");
+      item.tabIndex = 0;
+    }
 
     const swatchGrad = `linear-gradient(135deg, ${theme.blockTop}, ${theme.blockBot})`;
     const statusHtml = isSelected
@@ -1644,10 +1678,17 @@ function renderThemesList() {
     `;
 
     if (unlocked) {
-      item.addEventListener("click", () => {
+      const selectHandler = () => {
         applyTheme(theme.id);
         playWoodSound("rotate");
         renderThemesList();
+      };
+      item.addEventListener("click", selectHandler);
+      item.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          selectHandler();
+        }
       });
     }
 
@@ -1657,7 +1698,8 @@ function renderThemesList() {
 
 function openThemesModal() {
   hammerArmed = false;
-  updateUI(); scheduleDraw();
+  updateUI();
+  scheduleDraw();
   renderThemesList();
   document.getElementById("settings-modal").classList.remove("show");
   document.getElementById("themes-modal").classList.add("show");
@@ -1670,6 +1712,19 @@ document.getElementById("menu-themes-btn").addEventListener("click", () => {
 
 document.getElementById("close-themes-btn").addEventListener("click", () => {
   document.getElementById("themes-modal").classList.remove("show");
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    const themesModal = document.getElementById("themes-modal");
+    const settingsModal = document.getElementById("settings-modal");
+    if (themesModal.classList.contains("show")) {
+      themesModal.classList.remove("show");
+    } else if (settingsModal.classList.contains("show")) {
+      disarmResetConfirm();
+      settingsModal.classList.remove("show");
+    }
+  }
 });
 
 const peekBtn = document.getElementById("peek-board-btn");
@@ -1689,12 +1744,12 @@ peekBtn.addEventListener("pointercancel", stopPeek);
 peekBtn.addEventListener("pointerleave", stopPeek);
 
 document.getElementById("share-score-btn").addEventListener("click", async () => {
-  const shareText = `Es savācu ${score} punktus spēlē Koka Bloki! (Mans rekords: ${getBest()} p.) Vari pārspēt?`;
+  const shareText = `Es savācu ${score} punktus spēlē Koka bloki! (Mans rekords: ${getBest()} p.) Vari pārspēt?`;
   const shareUrl = window.location.href.split("?")[0];
   if (navigator.share) {
     try {
       await navigator.share({
-        title: "Koka Bloki",
+        title: "Koka bloki",
         text: shareText,
         url: shareUrl
       });
@@ -1727,16 +1782,17 @@ function startNewGame() {
   particles = [];
   floatingTexts = [];
   flashCells = [];
-  dragState = null; scheduleDraw();
+  dragState = null;
   document.getElementById("gameover-modal").classList.remove("show");
   document.getElementById("gameover-modal").classList.remove("peeking");
-  updateUI(); scheduleDraw();
+  updateUI();
+  scheduleDraw();
   saveGameState();
 }
 
 document.getElementById("modal-restart-btn").addEventListener("click", startNewGame);
 
-  window.addEventListener("pagehide", () => { commitBest(); saveGameState(); });
+window.addEventListener("pagehide", () => { commitBest(); saveGameState(); });
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") { commitBest(); saveGameState(); }
 });
@@ -1754,7 +1810,8 @@ if (shortcutAction === "new") {
   if (loadGameState()) {
     document.getElementById("score-val").textContent = displayedScore;
     commitBest();
-    updateUI(); scheduleDraw();
+    updateUI();
+    scheduleDraw();
     checkGameOver();
   } else {
     startNewGame();

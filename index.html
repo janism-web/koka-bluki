@@ -2,16 +2,16 @@
 <html lang="lv">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#FFF3B0" id="meta-theme" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="Spēļu kaste" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <title>Spēļu kaste</title>
   <link rel="manifest" href="./manifest.json" />
   <link rel="icon" type="image/svg+xml" href="./icon.svg" />
   <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+  <link rel="preload" href="./fonts/nunito-latin-ext-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="./fonts/nunito-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="./shared.css" />
   <link rel="stylesheet" href="./hub.css" />
@@ -34,7 +34,7 @@
         <svg id="theme-icon-moon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
         </svg>
-        <svg id="theme-icon-sun" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="display:none;" aria-hidden="true">
+        <svg id="theme-icon-sun" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <circle cx="12" cy="12" r="5"/>
           <line x1="12" y1="1" x2="12" y2="3"/>
           <line x1="12" y1="21" x2="12" y2="23"/>
@@ -75,8 +75,8 @@
           </div>
         </div>
         <div class="card-info">
-          <div class="card-title">Koka Bloki</div>
-          <div class="card-desc">Saliec figūras un attīri rindas un kvadrātus</div>
+          <div class="card-title">Koka bloki</div>
+          <div class="card-desc">Saliec figūras un attīri rindas un kolonnas</div>
           <div class="card-best" id="koka-best-badge" style="display:none;"></div>
         </div>
         <div class="play-arrow" aria-hidden="true">
@@ -94,20 +94,15 @@
 
   <script>
     (() => {
-      const moonIcon = document.getElementById('theme-icon-moon');
-      const sunIcon = document.getElementById('theme-icon-sun');
-
-      function syncIcons() {
+      function syncTheme() {
         const isDark = document.documentElement.classList.contains('dark-mode');
-        moonIcon.style.display = isDark ? 'none' : 'block';
-        sunIcon.style.display = isDark ? 'block' : 'none';
         SK.applyDark(isDark);
       }
-      syncIcons();
+      syncTheme();
 
       document.getElementById('theme-toggle-btn').addEventListener('click', () => {
         SK.setDark(!document.documentElement.classList.contains('dark-mode'));
-        syncIcons();
+        syncTheme();
       });
 
       function refreshBadges() {

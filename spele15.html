@@ -2,16 +2,16 @@
 <html lang="lv">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#FFF3B0" id="meta-theme" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="Spēļu kaste" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <title>Spēle 15 — Spēļu kaste</title>
   <link rel="manifest" href="./manifest.json" />
   <link rel="icon" type="image/svg+xml" href="./icon.svg" />
   <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+  <link rel="preload" href="./fonts/nunito-latin-ext-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="./fonts/nunito-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="./shared.css" />
   <link rel="stylesheet" href="./spele15.css" />
@@ -30,7 +30,14 @@
   <main class="app">
     <header>
       <div class="top-bar">
-        <h1 class="title">Spēle 15</h1>
+        <div class="title-group">
+          <a href="./index.html" class="back-hub-btn" aria-label="Atpakaļ uz Spēļu kasti" title="Spēļu kaste">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+          </a>
+          <h1 class="title">Spēle 15</h1>
+        </div>
         <div class="best-chip" id="best-chip" style="display:none;">
           <span>★</span>
           <span id="best-chip-val">—</span>
@@ -109,10 +116,10 @@
     <button class="undo-btn" id="undo-btn" type="button">Atsaukt</button>
   </div>
 
-  <div class="modal-backdrop" id="win-modal">
+  <div class="modal-backdrop" id="win-modal" role="dialog" aria-modal="true" aria-labelledby="win-title">
     <div class="win-sheet">
       <div class="win-badge" id="win-badge">★ Lieliski paveikts!</div>
-      <h2 class="win-title">Uzvara!</h2>
+      <h2 class="win-title" id="win-title">Uzvara!</h2>
       <div class="win-stats">
         <div class="win-stat-box">
           <div class="win-stat-label">Gājieni</div>
@@ -123,7 +130,10 @@
           <div class="win-stat-val" id="win-time">00:00</div>
         </div>
       </div>
-      <button class="shuffle-btn" id="play-again-btn" type="button">Spēlēt vēlreiz</button>
+      <div class="win-actions">
+        <a href="./index.html" class="win-hub-btn">Spēļu kaste</a>
+        <button class="shuffle-btn" id="play-again-btn" type="button">Spēlēt vēlreiz</button>
+      </div>
     </div>
   </div>
   <script src="./spele15.js"></script>
